@@ -45,6 +45,7 @@ void MainWindow::on_action_openFile_triggered()
         totalArea += abs(aPoly.Area());
     }
     ui->label_totalArea->setText(tr("Total area:%1").arg(totalArea));
+    setWindowTitle(tr("NFPNest") + '(' + fileName + ')');
 }
 
 void MainWindow::on_action_saveResult_triggered()
@@ -74,6 +75,7 @@ void MainWindow::on_action_reset_triggered()
     ui->label_polygonNb->setText(tr("Polygon number:XXX"));
     ui->label_totalArea->setText(tr("Total area:XXX"));
     ui->label_utilizationRate->setText(tr("Utilization rate:XXX"));
+    setWindowTitle(tr("NFPNest"));
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event)

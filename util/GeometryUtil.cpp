@@ -1571,6 +1571,7 @@ Polygon polygonUnion(Polygon A, Polygon B)
         current++;
     }
 
+    // erase the redundant vertex
     for (i = 0; i < C.size(); i++) {
         int next = (i == C.size() - 1) ? 0 : i + 1;
         if (C[i] ==  C[next]) {
@@ -1579,15 +1580,32 @@ Polygon polygonUnion(Polygon A, Polygon B)
         }
     }
 
+    // offset the same point to avoid error
+
+    auto zcrossproduct = [](Point k, Point k1, Point k2) {
+            auto dx1 = k1.x - k.x;
+            auto dy1 = k1.y - k.y;
+            auto dx2 = k2.x - k1.x;
+            auto dy2 = k2.y - k1.y;
+            return dx1*dy2 - dy1*dx2;
+        };
+
     for (i = 0; i < C.size(); i++) {
         int prei = (i ==  0)? C.size() - 1 : i - 1;
+        int nexti = (i ==  C.size() - 1)? 0 : i + 1;
         for (j = C.size()-1; j>i; j--) {
             int prej = (j ==  0)? C.size() - 1 : j - 1;
+            int nextj = (j ==  C.size() - 1)? 0 : j + 1;
             if (C[i] ==  C[j]) {
-                C[i].x = 0.9*C[i].x + 0.1*C[prei].x;
-                C[i].y = 0.9*C[i].y + 0.1*C[prei].y;
-                C[j].x = 0.9*C[j].x + 0.1*C[prej].x;
-                C[j].y = 0.9*C[j].y + 0.1*C[prej].y;
+                bool signi = zcrossproduct(C[prei],C[i],C[nexti]) < 0;
+                bool signj = zcrossproduct(C[prej],C[j],C[nextj]) < 0;
+
+                if(C.IsAntiClockWise() == signi) {
+                    C[i] = C[i]*0.95 + C[prei]*0.05;
+                }
+                if(C.IsAntiClockWise() == signj) {
+                    C[j] = C[j]*0.95 + C[prej]*0.05;
+                }
             }
         }
     }

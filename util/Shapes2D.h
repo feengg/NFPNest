@@ -18,6 +18,16 @@ struct Point {
     bool operator!=(const Point& other) const {
         return !this->operator==(other);
     }
+
+    Point operator+(const Point& other) const {
+        return Point{x+other.x,y+other.y};
+    }
+    Point operator-(const Point& other) const {
+        return Point{x-other.x,y-other.y};
+    }
+    Point operator*(double val) const {
+        return Point{x*val,y*val};
+    }
 };
 
 struct Rect {
