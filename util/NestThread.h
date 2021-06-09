@@ -5,8 +5,9 @@
 #include <QWaitCondition>
 #include <QMutex>
 
-#include "GeometryUtil.h"
-using namespace QGeometryUtil;
+#include "LB_NFPHandle.h"
+using namespace LB_NFP;
+using namespace Shape2D;
 
 class NestThread : public QThread
 {

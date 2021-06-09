@@ -1,9 +1,6 @@
 #include "NestThread.h"
 #include <QDebug>
 
-//#define USE_QT
-//#define SHOW_SLOW
-
 NestThread::NestThread(QObject *parent) : QThread(parent)
 {    
 }
@@ -24,7 +21,7 @@ void NestThread::run()
 
         // 2.set the first locatioin
         unPlaced[0].SetLocation(0,0);
-        unPlaced[0].stripID = m_stripNb-1;
+        unPlaced[0].SetID(m_stripNb-1);
         emit AddItem(unPlaced[0]);
 
         Polygon last = unPlaced[0];
@@ -56,26 +53,23 @@ void NestThread::run()
             int left = m_stripWidth;
             for(int i=0;i<nfp.size();++i) {
                 orb.SetPosition(nfp[i],0);
-                if(orb.x<0 || orb.x+orb.width>m_stripWidth)
+                if(orb.X()<0 || orb.X()+orb.Width()>m_stripWidth)
                     continue;
 
-                if(orb.y<0 || orb.y+orb.height>m_stripHeight)
+                if(orb.Y()<0 || orb.Y()+orb.Height()>m_stripHeight)
                     continue;
 
-                if(orb.x<left)
+                if(orb.X()<left)
                 {
-                    left = orb.x;
+                    left = orb.X();
                     leftIndex = i;
                 }
             }
 
             if(leftIndex != -1) {
                 orb.SetPosition(nfp[leftIndex],0);
-                orb.stripID = m_stripNb-1;
+                orb.SetID(m_stripNb-1);
                 emit AddItem(orb);
-#ifdef SHOW_SLOW
-                msleep(1000);
-#endif
 
                 // get the hull of the polygons which have been placed
                 bool ret1 = orb.IsAntiClockWise();
@@ -84,17 +78,7 @@ void NestThread::run()
                     std::reverse(orb.begin(),orb.end());
                 }
 
-#ifdef USE_QT
-                last.FromPolygonF(orb.ToPolygonF().united(last.ToPolygonF()));
-#else
-                last = polygonUnion(last,orb);
-#endif
-
-#ifdef SHOW_SLOW
-                last.stripID = m_stripNb-1;
-                emit AddItem(last);
-                msleep(1000);
-#endif
+                last = last.United(orb);
             }
             else {
                 operate.append(orb);
@@ -131,11 +115,11 @@ void NestThread::SortByWidthDecreasing()
 {
     for(int ctr = 0; ctr < m_polygons.size(); ++ctr)
     {
-        double maxWid = m_polygons[ctr].Bounds().width;
+        double maxWid = m_polygons[ctr].Bounds().Width();
         int maxIndex = ctr;
         for(int ctr2 = ctr + 1; ctr2 < m_polygons.size(); ++ctr2)
         {
-            double wid = m_polygons[ctr2].Bounds().width;
+            double wid = m_polygons[ctr2].Bounds().Width();
             if(wid > maxWid)
             {
                 maxWid = wid;

@@ -4,22 +4,24 @@
 #include <QVector>
 #include <QPolygonF>
 
-#include "LB_Coord2D.h"
 #include "LB_Rect2D.h"
 
 namespace Shape2D {
 
-enum class PointInPolygon {
+enum PointInPolygon {
     INSIDE,
     OUTSIDE,
     INVALID
 };
 
-class LB_Polygon2D : public QVector<LB_Coord2D>
+class Polygon : public QVector<Point>
 {
 public:
-    LB_Polygon2D(){}
-    LB_Polygon2D(std::initializer_list<LB_Coord2D> list);
+    Polygon(){}
+    Polygon(std::initializer_list<Point> list);
+
+    double offsetx = 0;
+    double offsety = 0;
 
     double X() const {
         return x;
@@ -36,6 +38,9 @@ public:
     int ID() const {
         return stripID;
     }
+    void SetID(int val) {
+        stripID = val;
+    }
 
     double Area() const;
 
@@ -44,9 +49,9 @@ public:
     LB_Rect2D Bounds() const;
 
     void SetLocation(double px, double py);
-    void SetLocation(const LB_Coord2D &pnt);
+    void SetLocation(const Point &pnt);
     void SetPosition(double px, double py, int index);
-    void SetPosition(const LB_Coord2D &pnt, int index);
+    void SetPosition(const Point &pnt, int index);
 
     bool IsConvex() const;
     bool IsAntiClockWise() const {
@@ -57,15 +62,15 @@ public:
     QPolygonF ToPolygonF() const;
     void FromPolygonF(const QPolygonF &aPoly);
 
-    PointInPolygon ContainPoint(const LB_Coord2D &point) const;
+    PointInPolygon ContainPoint(const Point &point) const;
 
-    bool Intersect(const LB_Polygon2D &other) const;
+    bool Intersect(const Polygon &other) const;
 
     bool IsRectangle(double tolerance = FLOAT_TOL);
 
-private:
-    double offsetx = 0;
-    double offsety = 0;
+    Polygon United(const Polygon &other) const;
+
+private:    
     double x = 0;
     double y = 0;
     double width = 0;

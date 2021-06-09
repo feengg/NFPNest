@@ -272,7 +272,7 @@ void MainWindow::on_action_resume_triggered()
 
 void MainWindow::onAddItem(Polygon poly)
 {
-    poly.Translate(poly.stripID*mapWidth,0);
+    poly.Translate(poly.ID()*mapWidth,0);
     QPolygonF target = poly.ToPolygonF();
     QGraphicsPolygonItem *anItem = new QGraphicsPolygonItem(target);
     anItem->setPen(QColor(Qt::gray));

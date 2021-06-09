@@ -5,13 +5,13 @@
 
 namespace BaseUtil {
 
-const double DIM_MAX = std::numeric_limits<double>::max();
-const double DIM_MIN = std::numeric_limits<double>::min();
-const double FLOAT_TOL = 1e-9;
-const double DEG2RAD = 0.017453293f;
-const double RAD2DEG = 57.2957796f;
+static const double DIM_MAX = std::numeric_limits<double>::max();
+static const double DIM_MIN = std::numeric_limits<double>::min();
+static const double FLOAT_TOL = 1e-9;
+static const double DEG2RAD = 0.017453293f;
+static const double RAD2DEG = 57.2957796f;
 
-bool FuzzyEqual(double a, double b, double tolerance = FLOAT_TOL) {
+static bool FuzzyEqual(double a, double b, double tolerance = FLOAT_TOL) {
     return fabs(a-b) < tolerance;
 }
 

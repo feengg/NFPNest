@@ -6,28 +6,28 @@ using namespace BaseUtil;
 
 namespace Shape2D {
 
-class LB_Coord2D
+class Point
 {
 public:
-    LB_Coord2D(){}
-    LB_Coord2D(double x, double y): x(x), y(y) {}
+    Point(){}
+    Point(double x, double y): x(x), y(y) {}
 
-    bool operator==(const LB_Coord2D& other) const {
+    bool operator==(const Point& other) const {
         return FuzzyEqual(this->x, other.x) && FuzzyEqual(this->y, other.y);
     }
 
-    bool operator!=(const LB_Coord2D& other) const {
+    bool operator!=(const Point& other) const {
         return !this->operator==(other);
     }
 
-    LB_Coord2D operator+(const LB_Coord2D& other) const {
-        return LB_Coord2D{x+other.x,y+other.y};
+    Point operator+(const Point& other) const {
+        return Point{x+other.x,y+other.y};
     }
-    LB_Coord2D operator-(const LB_Coord2D& other) const {
-        return LB_Coord2D{x-other.x,y-other.y};
+    Point operator-(const Point& other) const {
+        return Point{x-other.x,y-other.y};
     }
-    LB_Coord2D operator*(double val) const {
-        return LB_Coord2D{x*val,y*val};
+    Point operator*(double val) const {
+        return Point{x*val,y*val};
     }
 
     double X() const {
@@ -60,7 +60,7 @@ public:
         x *= inverse;
         y *= inverse;
     }
-    LB_Coord2D Normalized() const {
+    Point Normalized() const {
         if(FuzzyEqual(x*x + y*y, 1)){
             return *this; // vector was already a unit vector
         }
@@ -69,7 +69,7 @@ public:
         return this->operator*(inverse);
     }
 
-    static double ZCrossProduct(const LB_Coord2D &k, const LB_Coord2D &k1, const LB_Coord2D &k2) {
+    static double ZCrossProduct(const Point &k, const Point &k1, const Point &k2) {
         double dx1 = k1.X() - k.X();
         double dy1 = k1.Y() - k.Y();
         double dx2 = k2.X() - k1.X();
@@ -77,7 +77,7 @@ public:
         return dx1*dy2 - dy1*dx2;
     }
 
-    static bool OnSegment(const LB_Coord2D &A,const LB_Coord2D &B, const LB_Coord2D &p) {
+    static bool OnSegment(const Point &A,const Point &B, const Point &p) {
         // vertical line
         if(FuzzyEqual(A.x, B.x) && FuzzyEqual(p.x, A.x)){
             if(!FuzzyEqual(p.y, B.y) && !FuzzyEqual(p.y, A.y) && p.y < std::fmax(B.y, A.y) && p.y > std::fmin(B.y, A.y)){
@@ -129,7 +129,7 @@ public:
         return true;
     }
 
-    static LB_Coord2D LineIntersect(const LB_Coord2D& A,const LB_Coord2D& B,const LB_Coord2D& E,const LB_Coord2D& F, bool infinite = false) {
+    static Point LineIntersect(const Point& A,const Point& B,const Point& E,const Point& F, bool infinite = false) {
         double a1, a2, b1, b2, c1, c2, x, y;
 
         a1= B.y-A.y;
@@ -145,16 +145,16 @@ public:
         y = (a2*c1 - a1*c2)/denom;
 
         if(!std::isfinite(x) || !std::isfinite(y)){
-            return LB_Coord2D(DIM_MAX,DIM_MAX);
+            return Point(DIM_MAX,DIM_MAX);
         }
 
         if(!infinite){
             // coincident points do not count as intersecting
-            if (fabs(A.x-B.x) > FLOAT_TOL && (( A.x < B.x ) ? x < A.x || x > B.x : x > A.x || x < B.x )) return LB_Coord2D(DIM_MAX,DIM_MAX);
-            if (fabs(A.y-B.y) > FLOAT_TOL && (( A.y < B.y ) ? y < A.y || y > B.y : y > A.y || y < B.y )) return LB_Coord2D(DIM_MAX,DIM_MAX);
+            if (fabs(A.x-B.x) > FLOAT_TOL && (( A.x < B.x ) ? x < A.x || x > B.x : x > A.x || x < B.x )) return Point(DIM_MAX,DIM_MAX);
+            if (fabs(A.y-B.y) > FLOAT_TOL && (( A.y < B.y ) ? y < A.y || y > B.y : y > A.y || y < B.y )) return Point(DIM_MAX,DIM_MAX);
 
-            if (fabs(E.x-F.x) > FLOAT_TOL && (( E.x < F.x ) ? x < E.x || x > F.x : x > E.x || x < F.x )) return LB_Coord2D(DIM_MAX,DIM_MAX);
-            if (fabs(E.y-F.y) > FLOAT_TOL && (( E.y < F.y ) ? y < E.y || y > F.y : y > E.y || y < F.y )) return LB_Coord2D(DIM_MAX,DIM_MAX);
+            if (fabs(E.x-F.x) > FLOAT_TOL && (( E.x < F.x ) ? x < E.x || x > F.x : x > E.x || x < F.x )) return Point(DIM_MAX,DIM_MAX);
+            if (fabs(E.y-F.y) > FLOAT_TOL && (( E.y < F.y ) ? y < E.y || y > F.y : y > E.y || y < F.y )) return Point(DIM_MAX,DIM_MAX);
         }
 
         return {x, y};
@@ -166,7 +166,7 @@ private:
     bool marked = false;
 };
 
-const LB_Coord2D INVALID_POINT(DIM_MAX,DIM_MAX);
+const Point INVALID_POINT(DIM_MAX,DIM_MAX);
 
 }
 

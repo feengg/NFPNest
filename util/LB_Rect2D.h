@@ -1,7 +1,6 @@
 #ifndef LB_RECT2D_H
 #define LB_RECT2D_H
 
-#include "LB_BaseUtil.h"
 #include "LB_Coord2D.h"
 
 namespace Shape2D {
@@ -11,7 +10,7 @@ class LB_Rect2D
 public:
     LB_Rect2D(){}
     LB_Rect2D(double x, double y, double width, double height): x(x), y(y), width(width), height(height) {}
-    LB_Rect2D(const LB_Coord2D &aCoord, double width, double height): x(aCoord.X()), y(aCoord.Y()), width(width), height(height) {}
+    LB_Rect2D(const Point &aCoord, double width, double height): x(aCoord.X()), y(aCoord.Y()), width(width), height(height) {}
 
     double X() const {
         return x;
