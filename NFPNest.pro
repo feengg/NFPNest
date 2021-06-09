@@ -9,6 +9,10 @@ HEADERS += \
     mainwindow.h \
     util/Constants.h \
     util/GeometryUtil.h \
+    util/LB_BaseUtil.h \
+    util/LB_Coord2D.h \
+    util/LB_Polygon2D.h \
+    util/LB_Rect2D.h \
     util/NestThread.h \
     util/Shapes2D.h
 
@@ -17,6 +21,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     util/GeometryUtil.cpp \
+    util/LB_Polygon2D.cpp \
     util/NestThread.cpp \
     util/Shapes2D.cpp
 	
