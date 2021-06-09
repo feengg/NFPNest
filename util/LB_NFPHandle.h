@@ -6,30 +6,30 @@ using namespace Shape2D;
 
 namespace LB_NFP {
 
-double pointDistance(const Point& p, const Point& s1, const Point& s2,
-                    Point normal, bool infinite = false);
+double pointDistance(const LB_Coord2D& p, const LB_Coord2D& s1, const LB_Coord2D& s2,
+                    LB_Coord2D normal, bool infinite = false);
 
-double segmentDistance(const Point& A, const Point& B, const Point& E,
-                      const Point& F, const Point& direction);
+double segmentDistance(const LB_Coord2D& A, const LB_Coord2D& B, const LB_Coord2D& E,
+                      const LB_Coord2D& F, const LB_Coord2D& direction);
 
-double polygonSlideDistance(Polygon A, Polygon B, const Point& direction,
+double polygonSlideDistance(LB_Polygon2D A, LB_Polygon2D B, const LB_Coord2D& direction,
                            bool ignoreNegative);
 
-double polygonProjectionDistance(Polygon A, Polygon B, const Point& direction);
+double polygonProjectionDistance(LB_Polygon2D A, LB_Polygon2D B, const LB_Coord2D& direction);
 
 // returns true if point already exists in the given nfp
-bool inNfp(const Point& p, const QVector<Polygon>& nfp);
+bool inNfp(const LB_Coord2D& p, const QVector<LB_Polygon2D>& nfp);
 
-Point searchStartPoint(Polygon A, Polygon B, bool inside,
-                       const QVector<Polygon>& NFP = {});
+LB_Coord2D searchStartPoint(LB_Polygon2D A, LB_Polygon2D B, bool inside,
+                       const QVector<LB_Polygon2D>& NFP = {});
 
 // returns an interior NFP for the special case where A is a rectangle
-QVector<Polygon> noFitPolygonRectangle(const Polygon& A, const Polygon& B);
+QVector<LB_Polygon2D> noFitPolygonRectangle(const LB_Polygon2D& A, const LB_Polygon2D& B);
 
 // given a static polygon A and a movable polygon B, compute a no fit polygon by orbiting B about A
 // if the inside flag is set, B is orbited inside of A rather than outside
 // if the searchEdges flag is set, all edges of A are explored for NFPs - multiple
-QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdges);
+QVector<LB_Polygon2D> noFitPolygon(LB_Polygon2D A, LB_Polygon2D B, bool inside, bool searchEdges);
 
 }
 

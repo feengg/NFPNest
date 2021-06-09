@@ -19,10 +19,10 @@ public:
 
     void SetStripSize(double width, double height);
 
-    void SetPolygons(const QVector<Polygon> &polygons) {
+    void SetPolygons(const QVector<LB_Polygon2D> &polygons) {
         m_polygons = polygons;
     }
-    void AppendPolygon(const Polygon &aPolygon) {
+    void AppendPolygon(const LB_Polygon2D &aPolygon) {
         m_polygons.push_back(aPolygon);
     }
 
@@ -41,14 +41,14 @@ private:
     double m_stripWidth;
     double m_stripHeight;
     int m_stripNb;
-    QVector<Polygon> m_polygons;
+    QVector<LB_Polygon2D> m_polygons;
 
     bool doNestWait = false;
     QWaitCondition waitCondition;
     QMutex aMutex;
 
 signals:
-    void AddItem(Polygon poly);
+    void AddItem(LB_Polygon2D poly);
     void AddStrip();
     void NestEnd();
 };

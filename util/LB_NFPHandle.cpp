@@ -2,11 +2,11 @@
 
 namespace LB_NFP {
 
-double pointDistance(const Point &p, const Point &s1, const Point &s2, Point normal, bool infinite)
+double pointDistance(const LB_Coord2D &p, const LB_Coord2D &s1, const LB_Coord2D &s2, LB_Coord2D normal, bool infinite)
 {
     normal.Normalize();
 
-    Point dir(normal.Y(), -normal.X());
+    LB_Coord2D dir(normal.Y(), -normal.X());
 
     double pdot = p.X() * dir.X() + p.Y() * dir.Y();
     double s1dot = s1.X() * dir.X() + s1.Y() * dir.Y();
@@ -37,11 +37,11 @@ double pointDistance(const Point &p, const Point &s1, const Point &s2, Point nor
              + (s1dotnorm - s2dotnorm) * (s1dot - pdot) / (s1dot - s2dot));
 }
 
-double segmentDistance(const Point &A, const Point &B, const Point &E, const Point &F, const Point &direction)
+double segmentDistance(const LB_Coord2D &A, const LB_Coord2D &B, const LB_Coord2D &E, const LB_Coord2D &F, const LB_Coord2D &direction)
 {
-    Point normal = { direction.Y(), -direction.X() };
+    LB_Coord2D normal = { direction.Y(), -direction.X() };
 
-    Point reverse = { -direction.X(), -direction.Y() };
+    LB_Coord2D reverse = { -direction.X(), -direction.Y() };
 
     double dotA = A.X() * normal.X() + A.Y() * normal.Y();
     double dotB = B.X() * normal.X() + B.Y() * normal.Y();
@@ -89,8 +89,8 @@ double segmentDistance(const Point &A, const Point &B, const Point &E, const Poi
     // lines are colinear
     if (FuzzyEqual(crossABE, 0) && FuzzyEqual(crossABF, 0)) {
 
-        Point ABnorm = { B.Y() - A.Y(), A.X() - B.X() };
-        Point EFnorm = { F.Y() - E.Y(), E.X() - F.X() };
+        LB_Coord2D ABnorm = { B.Y() - A.Y(), A.X() - B.X() };
+        LB_Coord2D EFnorm = { F.Y() - E.Y(), E.X() - F.X() };
 
         double ABnormlength = sqrt(ABnorm.X() * ABnorm.X() + ABnorm.Y() * ABnorm.Y());
         ABnorm.RX() /= ABnormlength;
@@ -187,9 +187,9 @@ double segmentDistance(const Point &A, const Point &B, const Point &E, const Poi
     return *std::min_element(distances.begin(), distances.end());
 }
 
-double polygonSlideDistance(Polygon A, Polygon B, const Point &direction, bool ignoreNegative)
+double polygonSlideDistance(LB_Polygon2D A, LB_Polygon2D B, const LB_Coord2D &direction, bool ignoreNegative)
 {
-    Point A1, A2, B1, B2;
+    LB_Coord2D A1, A2, B1, B2;
     double Aoffsetx, Aoffsety, Boffsetx, Boffsety;
 
     Aoffsetx = A.offsetx;
@@ -207,13 +207,13 @@ double polygonSlideDistance(Polygon A, Polygon B, const Point &direction, bool i
         B.push_back(B.front());
     }
 
-    Polygon edgeA = A;
-    Polygon edgeB = B;
+    LB_Polygon2D edgeA = A;
+    LB_Polygon2D edgeB = B;
 
     double distance = DIM_MAX;
     double d;
 
-    Point dir = direction.Normalized();
+    LB_Coord2D dir = direction.Normalized();
 
     for (int i = 0; i < edgeB.size() - 1; i++) {
         for (int j = 0; j < edgeA.size() - 1; j++) {
@@ -238,7 +238,7 @@ double polygonSlideDistance(Polygon A, Polygon B, const Point &direction, bool i
     return distance;
 }
 
-double polygonProjectionDistance(Polygon A, Polygon B, const Point &direction)
+double polygonProjectionDistance(LB_Polygon2D A, LB_Polygon2D B, const LB_Coord2D &direction)
 {
     double Boffsetx = B.offsetx;
     double Boffsety = B.offsety;
@@ -255,17 +255,17 @@ double polygonProjectionDistance(Polygon A, Polygon B, const Point &direction)
         B.push_back(B[0]);
     }
 
-    Polygon edgeA = A;
-    Polygon edgeB = B;
+    LB_Polygon2D edgeA = A;
+    LB_Polygon2D edgeB = B;
 
     double distance = DIM_MAX;
-    Point p, s1, s2;
+    LB_Coord2D p, s1, s2;
     double d;
 
     for (int i = 0; i < edgeB.size(); i++) {
         // the shortest/most negative projection of B onto A
         double minprojection = DIM_MAX;
-        Point minp = INVALID_POINT;
+        LB_Coord2D minp = INVALID_POINT;
         for (int j = 0; j < edgeA.size() - 1; j++) {
             p = {edgeB[i].X() + Boffsetx, edgeB[i].Y() + Boffsety};
             s1 = {edgeA[j].X() + Aoffsetx, edgeA[j].Y() + Aoffsety};
@@ -292,7 +292,7 @@ double polygonProjectionDistance(Polygon A, Polygon B, const Point &direction)
     return distance;
 }
 
-bool inNfp(const Point &p, const QVector<Polygon> &nfp)
+bool inNfp(const LB_Coord2D &p, const QVector<LB_Polygon2D> &nfp)
 {
     if (nfp.empty()) {
         return false;
@@ -309,7 +309,7 @@ bool inNfp(const Point &p, const QVector<Polygon> &nfp)
     return false;
 }
 
-Point searchStartPoint(Polygon A, Polygon B, bool inside, const QVector<Polygon> &NFP)
+LB_Coord2D searchStartPoint(LB_Polygon2D A, LB_Polygon2D B, bool inside, const QVector<LB_Polygon2D> &NFP)
 {
     // close the loop for polygons
     if (A[0] != A[A.size() - 1]) {
@@ -341,7 +341,7 @@ Point searchStartPoint(Polygon A, Polygon B, bool inside, const QVector<Polygon>
                     return INVALID_POINT;
                 }
 
-                Point startPoint = { B.offsetx, B.offsety };
+                LB_Coord2D startPoint = { B.offsetx, B.offsety };
                 if (((Binside && inside) || (!Binside && !inside)) && !A.Intersect(B)
                         && !inNfp(startPoint, NFP)) {
                     return startPoint;
@@ -406,7 +406,7 @@ Point searchStartPoint(Polygon A, Polygon B, bool inside, const QVector<Polygon>
     return INVALID_POINT;
 }
 
-QVector<Polygon> noFitPolygonRectangle(const Polygon &A, const Polygon &B)
+QVector<LB_Polygon2D> noFitPolygonRectangle(const LB_Polygon2D &A, const LB_Polygon2D &B)
 {
     double minAx = A[0].X();
     double minAy = A[0].Y();
@@ -463,7 +463,7 @@ QVector<Polygon> noFitPolygonRectangle(const Polygon &A, const Polygon &B)
         }};
 }
 
-QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdges)
+QVector<LB_Polygon2D> noFitPolygon(LB_Polygon2D A, LB_Polygon2D B, bool inside, bool searchEdges)
 {
     if(A.size() < 3 || B.size() < 3){
         return {};
@@ -496,7 +496,7 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
         }
     }
 
-    Point startpoint;
+    LB_Coord2D startpoint;
     if(!inside){
         // shift B such that the bottom-most point of B is at the top-most point of A. This guarantees an initial placement with no intersections
         startpoint = {
@@ -509,7 +509,7 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
         startpoint = searchStartPoint(A,B,true);
     }
 
-    QVector<Polygon> NFPlist;
+    QVector<LB_Polygon2D> NFPlist;
 
     struct EdgeDescriptor {
         int8_t type;
@@ -525,8 +525,8 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
         // maintain a list of touching points/edges
         QVector<EdgeDescriptor> touching;
 
-        Point prevvector = INVALID_POINT; // keep track of previous vector
-        Polygon NFP;
+        LB_Coord2D prevvector = INVALID_POINT; // keep track of previous vector
+        LB_Polygon2D NFP;
         NFP.push_back({B[0].X()+B.offsetx,B[0].Y()+B.offsety});
 
         double referencex = B[0].X()+B.offsetx;
@@ -545,10 +545,10 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
                     if(FuzzyEqual(A[i].X(), B[j].X()+B.offsetx) && FuzzyEqual(A[i].Y(), B[j].Y()+B.offsety)){
                         touching.push_back({ 0, i, j });
                     }
-                    else if(Shape2D::Point::OnSegment(A[i],A[nexti],{B[j].X()+B.offsetx, B[j].Y() + B.offsety})){
+                    else if(Shape2D::LB_Coord2D::OnSegment(A[i],A[nexti],{B[j].X()+B.offsetx, B[j].Y() + B.offsety})){
                         touching.push_back({	1, nexti, j });
                     }
-                    else if(Shape2D::Point::OnSegment({B[j].X()+B.offsetx, B[j].Y() + B.offsety},{B[nextj].X()+B.offsetx, B[nextj].Y() + B.offsety},A[i])){
+                    else if(Shape2D::LB_Coord2D::OnSegment({B[j].X()+B.offsetx, B[j].Y() + B.offsety},{B[nextj].X()+B.offsetx, B[nextj].Y() + B.offsety},A[i])){
                         touching.push_back({	2, i, nextj });
                     }
                 }
@@ -558,8 +558,8 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
             struct TransVector {
                 double x;
                 double y;
-                Point start;
-                Point end;
+                LB_Coord2D start;
+                LB_Coord2D end;
 
                 bool operator==(const TransVector& other) const {
                     return this->x == other.x && this->y == other.y && this->start == other.start && this->end == other.end;
@@ -574,7 +574,7 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
             // generate translation vectors from touching vertices/edges
             QVector<TransVector> vectors;
             for(i=0; i<touching.size(); i++){
-                Point vertexA = A[touching[i].A];
+                LB_Coord2D vertexA = A[touching[i].A];
                 vertexA.setMarked(true);
 
                 // adjacent A vertices
@@ -584,11 +584,11 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
                 prevAindex = (prevAindex < 0) ? A.size()-1 : prevAindex; // loop
                 nextAindex = (nextAindex >= A.size()) ? 0 : nextAindex; // loop
 
-                Point prevA = A[prevAindex];
-                Point nextA = A[nextAindex];
+                LB_Coord2D prevA = A[prevAindex];
+                LB_Coord2D nextA = A[nextAindex];
 
                 // adjacent B vertices
-                Point vertexB = B[touching[i].B];
+                LB_Coord2D vertexB = B[touching[i].B];
 
                 int prevBindex = touching[i].B-1;
                 int nextBindex = touching[i].B+1;
@@ -596,8 +596,8 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
                 prevBindex = (prevBindex < 0) ? B.size()-1 : prevBindex; // loop
                 nextBindex = (nextBindex >= B.size()) ? 0 : nextBindex; // loop
 
-                Point prevB = B[prevBindex];
-                Point nextB = B[nextBindex];
+                LB_Coord2D prevB = B[prevBindex];
+                LB_Coord2D nextB = B[nextBindex];
 
                 if(touching[i].type == 0){
                     TransVector vA1 = {
@@ -681,10 +681,10 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
                 if(prevvector != INVALID_POINT && vectors[i].y * prevvector.Y() + vectors[i].x * prevvector.X() < 0){
                     // compare magnitude with unit vectors
                     double vectorlength = sqrt(vectors[i].x*vectors[i].x+vectors[i].y*vectors[i].y);
-                    Point unitv = {vectors[i].x/vectorlength, vectors[i].y/vectorlength};
+                    LB_Coord2D unitv = {vectors[i].x/vectorlength, vectors[i].y/vectorlength};
 
                     double prevlength = sqrt(prevvector.X()*prevvector.X()+prevvector.Y()*prevvector.Y());
-                    Point prevunit = {prevvector.X()/prevlength, prevvector.Y()/prevlength};
+                    LB_Coord2D prevunit = {prevvector.X()/prevlength, prevvector.Y()/prevlength};
 
                     // we need to scale down to unit vectors to normalize vector length. Could also just do a tan here
                     if(fabs(unitv.Y() * prevunit.X() - unitv.X() * prevunit.Y()) < 0.0001){
@@ -692,7 +692,7 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
                     }
                 }
 
-                Point pv = {vectors[i].x, vectors[i].y};
+                LB_Coord2D pv = {vectors[i].x, vectors[i].y};
                 double d = polygonSlideDistance(A, B, pv, true);
                 double vecd2 = vectors[i].x*vectors[i].x + vectors[i].y*vectors[i].y;
 
@@ -717,7 +717,7 @@ QVector<Polygon> noFitPolygon(Polygon A, Polygon B, bool inside, bool searchEdge
             translate.start.setMarked(true);
             translate.end.setMarked(true);
 
-            prevvector = Point(translate.x, translate.y);
+            prevvector = LB_Coord2D(translate.x, translate.y);
 
             // trim
             double vlength2 = translate.x*translate.x + translate.y*translate.y;

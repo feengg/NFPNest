@@ -35,7 +35,7 @@ private slots:
     void on_action_pause_triggered();
     void on_action_resume_triggered();
 
-    void onAddItem(Polygon poly);
+    void onAddItem(LB_Polygon2D poly);
     void onAddStrip();
     void onNestEnd();    
 
@@ -44,7 +44,7 @@ protected:
     void zoom(int steps);
 
     QColor randomColor();
-    Polygon randomPolygon();
+    LB_Polygon2D randomPolygon();
     int randInt(const int &min, const int &max);
 
 private:
@@ -53,12 +53,12 @@ private:
     const int mapHeight;
     double totalArea;
 
-    QVector<Polygon> srcPolys;
+    QVector<LB_Polygon2D> srcPolys;
 
     Strip *strip;
     NestThread *nestThread;
 
-    QVector<Polygon> loadPolygons(const QString &fileName);
+    QVector<LB_Polygon2D> loadPolygons(const QString &fileName);
 
     void test();
 };

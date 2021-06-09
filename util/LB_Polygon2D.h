@@ -14,11 +14,11 @@ enum PointInPolygon {
     INVALID
 };
 
-class Polygon : public QVector<Point>
+class LB_Polygon2D : public QVector<LB_Coord2D>
 {
 public:
-    Polygon(){}
-    Polygon(std::initializer_list<Point> list);
+    LB_Polygon2D(){}
+    LB_Polygon2D(std::initializer_list<LB_Coord2D> list);
 
     double offsetx = 0;
     double offsety = 0;
@@ -49,9 +49,9 @@ public:
     LB_Rect2D Bounds() const;
 
     void SetLocation(double px, double py);
-    void SetLocation(const Point &pnt);
+    void SetLocation(const LB_Coord2D &pnt);
     void SetPosition(double px, double py, int index);
-    void SetPosition(const Point &pnt, int index);
+    void SetPosition(const LB_Coord2D &pnt, int index);
 
     bool IsConvex() const;
     bool IsAntiClockWise() const {
@@ -62,13 +62,13 @@ public:
     QPolygonF ToPolygonF() const;
     void FromPolygonF(const QPolygonF &aPoly);
 
-    PointInPolygon ContainPoint(const Point &point) const;
+    PointInPolygon ContainPoint(const LB_Coord2D &point) const;
 
-    bool Intersect(const Polygon &other) const;
+    bool Intersect(const LB_Polygon2D &other) const;
 
     bool IsRectangle(double tolerance = FLOAT_TOL);
 
-    Polygon United(const Polygon &other) const;
+    LB_Polygon2D United(const LB_Polygon2D &other) const;
 
 private:    
     double x = 0;

@@ -11,8 +11,8 @@ void NestThread::run()
     SortByAreaDecreasing();
 
     m_stripNb = 0;
-    QVector<Polygon> unPlaced = m_polygons;
-    QVector<Polygon> operate;
+    QVector<LB_Polygon2D> unPlaced = m_polygons;
+    QVector<LB_Polygon2D> operate;
 
     while(!unPlaced.isEmpty())
     {
@@ -24,7 +24,7 @@ void NestThread::run()
         unPlaced[0].SetID(m_stripNb-1);
         emit AddItem(unPlaced[0]);
 
-        Polygon last = unPlaced[0];
+        LB_Polygon2D last = unPlaced[0];
         operate.clear();
 
         // 3.place the other polygons
@@ -37,9 +37,9 @@ void NestThread::run()
                 aMutex.unlock();
             }
 
-            Polygon &orb = unPlaced[i];
-            QVector<Polygon> NFPS = noFitPolygon(last,orb,false,false);
-            Polygon nfp;
+            LB_Polygon2D &orb = unPlaced[i];
+            QVector<LB_Polygon2D> NFPS = noFitPolygon(last,orb,false,false);
+            LB_Polygon2D nfp;
             if(!NFPS.isEmpty()) {
                 nfp = NFPS.takeFirst();
             }
@@ -126,7 +126,7 @@ void NestThread::SortByWidthDecreasing()
                 maxIndex = ctr2;
             }
         }
-        Polygon temp = m_polygons[ctr];
+        LB_Polygon2D temp = m_polygons[ctr];
         m_polygons[ctr] = m_polygons[maxIndex];
         m_polygons[maxIndex] = temp;
     }
@@ -147,7 +147,7 @@ void NestThread::SortByAreaDecreasing()
                 maxIndex = ctr2;
             }
         }
-        Polygon temp = m_polygons[ctr];
+        LB_Polygon2D temp = m_polygons[ctr];
         m_polygons[ctr] = m_polygons[maxIndex];
         m_polygons[maxIndex] = temp;
     }

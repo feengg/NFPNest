@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    qRegisterMetaType<Polygon>("Polygon");
+    qRegisterMetaType<LB_Polygon2D>("Polygon");
     strip = new Strip(mapWidth,mapHeight);
     nestThread = new NestThread(this);
     connect(nestThread,&NestThread::AddItem,this,&MainWindow::onAddItem);
@@ -41,7 +41,7 @@ void MainWindow::on_action_openFile_triggered()
     srcPolys = loadPolygons(fileName);
     ui->label_polygonNb->setText(tr("Polygon number:%1").arg(srcPolys.size()));
     totalArea = 0;
-    foreach(Polygon aPoly,srcPolys) {
+    foreach(LB_Polygon2D aPoly,srcPolys) {
         totalArea += abs(aPoly.Area());
     }
     ui->label_totalArea->setText(tr("Total area:%1").arg(totalArea));
@@ -108,7 +108,7 @@ QColor MainWindow::randomColor()
     return QColor(rand[0],rand[1],rand[2]);
 }
 
-Polygon MainWindow::randomPolygon()
+LB_Polygon2D MainWindow::randomPolygon()
 {
     int vertexNb = 6;
     int x1, x2;
@@ -117,7 +117,7 @@ Polygon MainWindow::randomPolygon()
 
     int generateDistance = randInt(MIN_GENERATE_DISTANCE,MAX_GENERATE_DISTANCE);
 
-    Polygon polygon;
+    LB_Polygon2D polygon;
     QVector<QLineF> lines;
 
     x1 = randInt(0,mapWidth / 3);
@@ -169,7 +169,7 @@ Polygon MainWindow::randomPolygon()
                     ++trySize;
                     if(trySize > GENERATE_RESET)
                     {
-                        Polygon poly;
+                        LB_Polygon2D poly;
                         return poly;
                     }
                     isIntersect = false;
@@ -201,7 +201,7 @@ Polygon MainWindow::randomPolygon()
 
     for(int ctr = 0; ctr < vertexNb; ++ctr)
     {
-        Point aPnt(lines.at(ctr).p1().x(),
+        LB_Coord2D aPnt(lines.at(ctr).p1().x(),
                    lines.at(ctr).p1().y());
         polygon.push_back(aPnt);
     }
@@ -215,9 +215,9 @@ int MainWindow::randInt(const int &min, const int &max)
     return QRandomGenerator::global()->bounded(min,max);
 }
 
-QVector<Polygon> MainWindow::loadPolygons(const QString &fileName)
+QVector<LB_Polygon2D> MainWindow::loadPolygons(const QString &fileName)
 {
-    QVector<Polygon> input;
+    QVector<LB_Polygon2D> input;
 
     QFile polyFile(fileName);
     QTextStream aStream(&polyFile);
@@ -228,7 +228,7 @@ QVector<Polygon> MainWindow::loadPolygons(const QString &fileName)
         {
             QString line = aStream.readLine();
             QStringList points = line.split(";");
-            Polygon aPoly;
+            LB_Polygon2D aPoly;
             for(int ctr = 0; ctr < points.size(); ++ctr)
             {
                 QStringList coordinates = points[ctr].split(",");
@@ -237,7 +237,7 @@ QVector<Polygon> MainWindow::loadPolygons(const QString &fileName)
 
                 double x = coordinates[0].toDouble();
                 double y = coordinates[1].toDouble();
-                aPoly.push_back(Point(x,y));
+                aPoly.push_back(LB_Coord2D(x,y));
             }
             aPoly.push_back(aPoly[0]);
             input.push_back(aPoly);
@@ -250,9 +250,6 @@ QVector<Polygon> MainWindow::loadPolygons(const QString &fileName)
 
 void MainWindow::test()
 {
-    for(int i=0;i<5;++i) {
-        srcPolys.append(randomPolygon());
-    }
 }
 
 void MainWindow::on_action_test_triggered()
@@ -270,7 +267,7 @@ void MainWindow::on_action_resume_triggered()
     nestThread->ResumeNest();
 }
 
-void MainWindow::onAddItem(Polygon poly)
+void MainWindow::onAddItem(LB_Polygon2D poly)
 {
     poly.Translate(poly.ID()*mapWidth,0);
     QPolygonF target = poly.ToPolygonF();

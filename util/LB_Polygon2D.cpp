@@ -1,7 +1,7 @@
 #include "LB_Polygon2D.h"
 namespace Shape2D {
 
-Polygon::Polygon(std::initializer_list<Point> list) : QVector<Point>(list)
+LB_Polygon2D::LB_Polygon2D(std::initializer_list<LB_Coord2D> list) : QVector<LB_Coord2D>(list)
 {
     if(list.size() == 0)
         return;
@@ -13,7 +13,7 @@ Polygon::Polygon(std::initializer_list<Point> list) : QVector<Point>(list)
     height = bounds.Height();
 }
 
-double Polygon::Area() const
+double LB_Polygon2D::Area() const
 {
     // https://zhuanlan.zhihu.com/p/110025234
     double area = 0;
@@ -24,14 +24,14 @@ double Polygon::Area() const
     return 0.5*area;
 }
 
-void Polygon::Rotate(double angle)
+void LB_Polygon2D::Rotate(double angle)
 {
     angle = angle * DEG2RAD;
-    foreach(Point pnt,*this){
-        double x = pnt.X();
-        double y = pnt.Y();
-        pnt.RX() = x*cos(angle)-y*sin(angle);
-        pnt.RY() = x*sin(angle)+y*cos(angle);
+    for(int i=0; i<size(); i++){
+        double x = operator[](i).X();
+        double y = operator[](i).Y();
+        operator[](i).RX() = x*cos(angle)-y*sin(angle);
+        operator[](i).RY() = x*sin(angle)+y*cos(angle);
     }
     // reset bounding box
     LB_Rect2D bounds = Bounds();
@@ -41,11 +41,11 @@ void Polygon::Rotate(double angle)
     height = bounds.Height();
 }
 
-void Polygon::Translate(double dx, double dy)
+void LB_Polygon2D::Translate(double dx, double dy)
 {
-    foreach(Point pnt,*this){
-        pnt.RX() += dx;
-        pnt.RY() += dy;
+    for(int i=0; i<size(); i++){
+        operator[](i).RX() += dx;
+        operator[](i).RY() += dy;
     }
     // reset bounding box
     LB_Rect2D bounds = Bounds();
@@ -55,7 +55,7 @@ void Polygon::Translate(double dx, double dy)
     height = bounds.Height();
 }
 
-LB_Rect2D Polygon::Bounds() const
+LB_Rect2D LB_Polygon2D::Bounds() const
 {
     if(size() < 3){
         return INVALID_RECT;
@@ -88,7 +88,7 @@ LB_Rect2D Polygon::Bounds() const
                      ymax-ymin);
 }
 
-void Polygon::SetLocation(double px, double py)
+void LB_Polygon2D::SetLocation(double px, double py)
 {
     LB_Rect2D bnd = Bounds();
     double dx = px - bnd.X();
@@ -96,12 +96,12 @@ void Polygon::SetLocation(double px, double py)
     Translate(dx,dy);
 }
 
-void Polygon::SetLocation(const Point &pnt)
+void LB_Polygon2D::SetLocation(const LB_Coord2D &pnt)
 {
     SetLocation(pnt.X(),pnt.Y());
 }
 
-void Polygon::SetPosition(double px, double py, int index)
+void LB_Polygon2D::SetPosition(double px, double py, int index)
 {
     if(index<0 || index>size()-1)
         return;
@@ -111,19 +111,19 @@ void Polygon::SetPosition(double px, double py, int index)
     Translate(dx,dy);
 }
 
-void Polygon::SetPosition(const Point &pnt, int index)
+void LB_Polygon2D::SetPosition(const LB_Coord2D &pnt, int index)
 {
     SetPosition(pnt.X(),pnt.Y(),index);
 }
 
-bool Polygon::IsConvex() const
+bool LB_Polygon2D::IsConvex() const
 {
     int size = this->size();
 
-    bool frsign = Point::ZCrossProduct(at(0),at(1),at(2)) > 0;
+    bool frsign = LB_Coord2D::ZCrossProduct(at(0),at(1),at(2)) > 0;
     bool ret = true;
     for(int i=0;i<size;++i) {
-        bool zc = Point::ZCrossProduct(at(i),
+        bool zc = LB_Coord2D::ZCrossProduct(at(i),
                                             at((i+1)%size),
                                             at((i+2)%size));
         ret &= frsign == (zc > 0);
@@ -132,7 +132,7 @@ bool Polygon::IsConvex() const
     return ret;
 }
 
-void Polygon::SetAntiClockWise()
+void LB_Polygon2D::SetAntiClockWise()
 {
     if(IsAntiClockWise())
         return;
@@ -140,7 +140,7 @@ void Polygon::SetAntiClockWise()
     std::reverse(this->begin(),this->end());
 }
 
-QPolygonF Polygon::ToPolygonF() const
+QPolygonF LB_Polygon2D::ToPolygonF() const
 {
     QPolygonF shape;
     for(int i=0;i<size();++i) {
@@ -149,15 +149,15 @@ QPolygonF Polygon::ToPolygonF() const
     return shape;
 }
 
-void Polygon::FromPolygonF(const QPolygonF &aPoly)
+void LB_Polygon2D::FromPolygonF(const QPolygonF &aPoly)
 {
     this->clear();
     foreach(QPointF pnt,aPoly) {
-        this->append(Point(pnt.x(),pnt.y()));
+        this->append(LB_Coord2D(pnt.x(),pnt.y()));
     }
 }
 
-PointInPolygon Polygon::ContainPoint(const Point &point) const
+PointInPolygon LB_Polygon2D::ContainPoint(const LB_Coord2D &point) const
 {
     // https://blog.csdn.net/hjh2005/article/details/9246967
     if(size() < 3){
@@ -176,7 +176,7 @@ PointInPolygon Polygon::ContainPoint(const Point &point) const
             return PointInPolygon::INVALID; // no result
         }
 
-        if(Point::OnSegment(at(i), at(j), point)){
+        if(LB_Coord2D::OnSegment(at(i), at(j), point)){
             return PointInPolygon::INVALID; // exactly on the segment
         }
 
@@ -191,14 +191,14 @@ PointInPolygon Polygon::ContainPoint(const Point &point) const
     return inside ? PointInPolygon::INSIDE : PointInPolygon::OUTSIDE;
 }
 
-bool Polygon::Intersect(const Polygon &other) const
+bool LB_Polygon2D::Intersect(const LB_Polygon2D &other) const
 {
     for(int i=0; i<size()-1; i++){
         for(int j=0; j<other.size()-1; j++){
-            Point a1 = at(i);
-            Point a2 = at(i+1);
-            Point b1 = other.at(i);
-            Point b2 = other.at(i+1);
+            LB_Coord2D a1 = at(i);
+            LB_Coord2D a2 = at(i+1);
+            LB_Coord2D b1 = other.at(i);
+            LB_Coord2D b2 = other.at(i+1);
 
             int prevbindex = (j == 0) ? other.size()-1 : j-1;
             int prevaindex = (i == 0) ? size()-1 : i-1;
@@ -223,13 +223,13 @@ bool Polygon::Intersect(const Polygon &other) const
                 nextaindex = (nextaindex == size()-1) ? 0 : nextaindex+1;
             }
 
-            Point a0 = at(prevaindex);
-            Point b0 = other[prevbindex];
+            LB_Coord2D a0 = at(prevaindex);
+            LB_Coord2D b0 = other[prevbindex];
 
-            Point a3 = at(nextaindex);
-            Point b3 = other[nextbindex];
+            LB_Coord2D a3 = at(nextaindex);
+            LB_Coord2D b3 = other[nextbindex];
 
-            if(Point::OnSegment(a1,a2,b1) || (a1 == b1)){
+            if(LB_Coord2D::OnSegment(a1,a2,b1) || (a1 == b1)){
                 // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
                 PointInPolygon b0in = ContainPoint(b0);
                 PointInPolygon b2in = ContainPoint(b2);
@@ -243,7 +243,7 @@ bool Polygon::Intersect(const Polygon &other) const
                 }
             }
 
-            if(Point::OnSegment(a1,a2,b2) || (a2 == b2)){
+            if(LB_Coord2D::OnSegment(a1,a2,b2) || (a2 == b2)){
                 // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
                 PointInPolygon b1in = ContainPoint(b1);
                 PointInPolygon b3in = ContainPoint(b3);
@@ -257,7 +257,7 @@ bool Polygon::Intersect(const Polygon &other) const
                 }
             }
 
-            if(Point::OnSegment(b1,b2,a1) || (a1 == b2)){
+            if(LB_Coord2D::OnSegment(b1,b2,a1) || (a1 == b2)){
                 // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
                 PointInPolygon a0in = other.ContainPoint(a0);
                 PointInPolygon a2in = other.ContainPoint(a2);
@@ -271,7 +271,7 @@ bool Polygon::Intersect(const Polygon &other) const
                 }
             }
 
-            if(Point::OnSegment(b1,b2,a2) || (a2 == b1)){
+            if(LB_Coord2D::OnSegment(b1,b2,a2) || (a2 == b1)){
                 // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
                 PointInPolygon a1in = other.ContainPoint(a1);
                 PointInPolygon a3in = other.ContainPoint(a3);
@@ -285,7 +285,7 @@ bool Polygon::Intersect(const Polygon &other) const
                 }
             }
 
-            Point p = Point::LineIntersect(b1, b2, a1, a2);
+            LB_Coord2D p = LB_Coord2D::LineIntersect(b1, b2, a1, a2);
 
             if(p != INVALID_POINT){
                 return true;
@@ -296,7 +296,7 @@ bool Polygon::Intersect(const Polygon &other) const
     return false;
 }
 
-bool Polygon::IsRectangle(double tolerance)
+bool LB_Polygon2D::IsRectangle(double tolerance)
 {
     LB_Rect2D bb = Bounds();
 
@@ -314,10 +314,10 @@ bool Polygon::IsRectangle(double tolerance)
     return true;
 }
 
-Polygon Polygon::United(const Polygon &other) const
+LB_Polygon2D LB_Polygon2D::United(const LB_Polygon2D &other) const
 {
-    Polygon A(*this);
-    Polygon B(other);
+    LB_Polygon2D A(*this);
+    LB_Polygon2D B(other);
 
     if (A.size() < 3 || B.size() < 3) {
         return {};
@@ -328,7 +328,7 @@ Polygon Polygon::United(const Polygon &other) const
     // start at an extreme point that is guaranteed to be on the final polygon
     double miny = A[0].Y();
     //FIXME: AMIR use pointers
-    Polygon startPolygon = A;
+    LB_Polygon2D startPolygon = A;
     int startIndex = 0;
 
     for (i = 0; i < A.size(); i++) {
@@ -353,7 +353,7 @@ Polygon Polygon::United(const Polygon &other) const
         A = startPolygon;
     }
 
-    Polygon C;
+    LB_Polygon2D C;
     int current = startIndex;
     int intercept1 = -1;
     int intercept2 = -1;
@@ -370,13 +370,13 @@ Polygon Polygon::United(const Polygon &other) const
                 intercept1 = j;
                 touching = true;
                 break;
-            } else if (Point::OnSegment(A[current],A[next],B[j])) {
+            } else if (LB_Coord2D::OnSegment(A[current],A[next],B[j])) {
                 C.push_back(A[current]);
                 C.push_back(B[j]);
                 intercept1 = j;
                 touching = true;
                 break;
-            } else if (Point::OnSegment(B[j],B[nextj],A[current])) {
+            } else if (LB_Coord2D::OnSegment(B[j],B[nextj],A[current])) {
                 C.push_back(A[current]);
                 C.push_back(B[nextj]);
                 intercept1 = j;
@@ -407,13 +407,13 @@ Polygon Polygon::United(const Polygon &other) const
                 intercept2 = j;
                 touching = true;
                 break;
-            } else if (Point::OnSegment(A[current],A[next],B[j])) {
+            } else if (LB_Coord2D::OnSegment(A[current],A[next],B[j])) {
                 C.push_front(A[current]);
                 C.push_front(B[j]);
                 intercept2 = j;
                 touching = true;
                 break;
-            } else if (Point::OnSegment(B[j],B[nextj],A[current])) {
+            } else if (LB_Coord2D::OnSegment(B[j],B[nextj],A[current])) {
                 C.push_front(A[current]);
                 intercept2 = j;
                 touching = true;
@@ -466,8 +466,8 @@ Polygon Polygon::United(const Polygon &other) const
             int prej = (j ==  0)? C.size() - 1 : j - 1;
             int nextj = (j ==  C.size() - 1)? 0 : j + 1;
             if (C[i] ==  C[j]) {
-                bool signi = Point::ZCrossProduct(C[prei],C[i],C[nexti]) < 0;
-                bool signj = Point::ZCrossProduct(C[prej],C[j],C[nextj]) < 0;
+                bool signi = LB_Coord2D::ZCrossProduct(C[prei],C[i],C[nexti]) < 0;
+                bool signj = LB_Coord2D::ZCrossProduct(C[prej],C[j],C[nextj]) < 0;
 
                 if(C.IsAntiClockWise() == signi) {
                     C[i] = C[i]*0.95 + C[prei]*0.05;
