@@ -1,5 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include <QTextStream>
+#include <QFile>
+#include <QFileDialog>
 #include <QDebug>
 
 #define GENERATE_RESET 100000
@@ -15,11 +19,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    qRegisterMetaType<LB_Polygon2D>("Polygon");
+    qRegisterMetaType<LB_Polygon2D>("LB_Polygon2D");
     strip = new Strip(mapWidth,mapHeight);
     nestThread = new NestThread(this);
-    connect(nestThread,&NestThread::AddItem,this,&MainWindow::onAddItem);
-    connect(nestThread,&NestThread::AddStrip,this,&MainWindow::onAddStrip);
+    connect(nestThread,&NestThread::AddItem,strip,&Strip::AddOneItem);
+    connect(nestThread,&NestThread::AddStrip,strip,&Strip::AddOneStrip);
     connect(nestThread,&NestThread::NestEnd,this,&MainWindow::onNestEnd);
 
     ui->label_stripWidth->setText(tr("Strip width:%1").arg(mapWidth));
@@ -66,10 +70,9 @@ void MainWindow::on_action_solve_triggered()
 
 void MainWindow::on_action_reset_triggered()
 {
-    strip->clear();
-    strip->setWidth(mapWidth);
+    strip->Reset();
     totalArea = 0;
-    srcPolys.clear();
+    srcPolys.clear();    
 
     ui->label_stripNb->setText(tr("Used strip number:XXX"));
     ui->label_polygonNb->setText(tr("Polygon number:XXX"));
@@ -99,13 +102,34 @@ void MainWindow::zoom(int steps)
     }
 }
 
-QColor MainWindow::randomColor()
+void MainWindow::on_action_test_triggered()
 {
-    int rand[3] = {0};
-    for(int i=0;i<3;++i)
-        rand[i] = randInt(0,255);
+    test();
+}
 
-    return QColor(rand[0],rand[1],rand[2]);
+void MainWindow::on_action_pause_triggered()
+{
+    nestThread->PauseNest();
+}
+
+void MainWindow::on_action_resume_triggered()
+{
+    nestThread->ResumeNest();
+}
+
+void MainWindow::onNestEnd()
+{
+    int stripNb = strip->GetUsedNumber();
+    ui->label_stripNb->setText((tr("Used strip number:%1").arg(stripNb)));
+    // Statistics
+    double anArea = 0;
+    ui->label_utilizationRate->clear();
+    QString content;
+    for(int i=0;i<stripNb;++i) {
+        anArea = strip->GetUtilization(i);
+        content.append(tr("Strip %1 Utilization rate:%2 % \n").arg(i).arg(100*anArea/(mapWidth*mapHeight)));
+    }
+    ui->label_utilizationRate->setText(content);
 }
 
 LB_Polygon2D MainWindow::randomPolygon()
@@ -210,11 +234,6 @@ LB_Polygon2D MainWindow::randomPolygon()
     return polygon;
 }
 
-int MainWindow::randInt(const int &min, const int &max)
-{
-    return QRandomGenerator::global()->bounded(min,max);
-}
-
 QVector<LB_Polygon2D> MainWindow::loadPolygons(const QString &fileName)
 {
     QVector<LB_Polygon2D> input;
@@ -250,47 +269,4 @@ QVector<LB_Polygon2D> MainWindow::loadPolygons(const QString &fileName)
 
 void MainWindow::test()
 {
-}
-
-void MainWindow::on_action_test_triggered()
-{
-    test();
-}
-
-void MainWindow::on_action_pause_triggered()
-{
-    nestThread->PauseNest();
-}
-
-void MainWindow::on_action_resume_triggered()
-{
-    nestThread->ResumeNest();
-}
-
-void MainWindow::onAddItem(LB_Polygon2D poly)
-{
-    poly.Translate(poly.ID()*mapWidth,0);
-    QPolygonF target = poly.ToPolygonF();
-    QGraphicsPolygonItem *anItem = new QGraphicsPolygonItem(target);
-    anItem->setPen(QColor(Qt::gray));
-    anItem->setBrush(randomColor());
-    anItem->setFlags(QGraphicsItem::ItemIsMovable);
-    strip->addItem(anItem);
-}
-
-void MainWindow::onAddStrip()
-{
-    int groupSize = nestThread->GetStripNb();
-    strip->setWidth(groupSize*mapWidth);
-    QGraphicsRectItem *rect = new QGraphicsRectItem(QRectF((groupSize-1)*mapWidth,
-                                                           0,
-                                                           mapWidth,
-                                                           mapHeight));
-    rect->setPen(QColor(Qt::red));
-    strip->addItem(rect);
-}
-
-void MainWindow::onNestEnd()
-{
-    ui->label_stripNb->setText((tr("Used strip number:%1").arg(nestThread->GetStripNb())));
 }

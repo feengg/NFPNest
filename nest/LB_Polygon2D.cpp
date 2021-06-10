@@ -123,7 +123,7 @@ bool LB_Polygon2D::IsConvex() const
     bool frsign = LB_Coord2D::ZCrossProduct(at(0),at(1),at(2)) > 0;
     bool ret = true;
     for(int i=0;i<size;++i) {
-        bool zc = LB_Coord2D::ZCrossProduct(at(i),
+        double zc = LB_Coord2D::ZCrossProduct(at(i),
                                             at((i+1)%size),
                                             at((i+2)%size));
         ret &= frsign == (zc > 0);
@@ -172,7 +172,7 @@ PointInPolygon LB_Polygon2D::ContainPoint(const LB_Coord2D &point) const
         double xj = at(j).X();
         double yj = at(j).Y();
 
-        if(FuzzyEqual(xi, point.X()) && FuzzyEqual(yi, point.Y())){
+        if(at(i) == point){
             return PointInPolygon::INVALID; // no result
         }
 
@@ -180,12 +180,13 @@ PointInPolygon LB_Polygon2D::ContainPoint(const LB_Coord2D &point) const
             return PointInPolygon::INVALID; // exactly on the segment
         }
 
-        if(FuzzyEqual(xi, xj) && FuzzyEqual(yi, yj)){ // ignore very small lines
+        if(at(i) == at(j)){ // ignore very small lines
             continue;
         }
 
         bool intersect = ((yi > point.Y()) != (yj > point.Y())) && (point.X() < (xj - xi) * (point.Y() - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
+        if (intersect)
+            inside = !inside;
     }
 
     return inside ? PointInPolygon::INSIDE : PointInPolygon::OUTSIDE;
@@ -230,7 +231,7 @@ bool LB_Polygon2D::Intersect(const LB_Polygon2D &other) const
             LB_Coord2D b3 = other[nextbindex];
 
             if(LB_Coord2D::OnSegment(a1,a2,b1) || (a1 == b1)){
-                // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
+                // if a point is on a segment, it could intersect or it could not. Check via the neighboring points
                 PointInPolygon b0in = ContainPoint(b0);
                 PointInPolygon b2in = ContainPoint(b2);
                 //AMIR: TESTME is this comparison correct in terms of handling INVALID?
@@ -244,7 +245,7 @@ bool LB_Polygon2D::Intersect(const LB_Polygon2D &other) const
             }
 
             if(LB_Coord2D::OnSegment(a1,a2,b2) || (a2 == b2)){
-                // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
+                // if a point is on a segment, it could intersect or it could not. Check via the neighboring points
                 PointInPolygon b1in = ContainPoint(b1);
                 PointInPolygon b3in = ContainPoint(b3);
                 //AMIR: TESTME is this comparison correct in terms of handling INVALID?
@@ -258,7 +259,7 @@ bool LB_Polygon2D::Intersect(const LB_Polygon2D &other) const
             }
 
             if(LB_Coord2D::OnSegment(b1,b2,a1) || (a1 == b2)){
-                // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
+                // if a point is on a segment, it could intersect or it could not. Check via the neighboring points
                 PointInPolygon a0in = other.ContainPoint(a0);
                 PointInPolygon a2in = other.ContainPoint(a2);
                 //AMIR: TESTME is this comparison correct in terms of handling INVALID?
@@ -272,7 +273,7 @@ bool LB_Polygon2D::Intersect(const LB_Polygon2D &other) const
             }
 
             if(LB_Coord2D::OnSegment(b1,b2,a2) || (a2 == b1)){
-                // if a LB_Coord2D is on a segment, it could intersect or it could not. Check via the neighboring LB_Coord2Ds
+                // if a point is on a segment, it could intersect or it could not. Check via the neighboring points
                 PointInPolygon a1in = other.ContainPoint(a1);
                 PointInPolygon a3in = other.ContainPoint(a3);
                 //AMIR: TESTME is this comparison correct in terms of handling INVALID?

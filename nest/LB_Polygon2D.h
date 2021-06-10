@@ -20,9 +20,6 @@ public:
     LB_Polygon2D(){}
     LB_Polygon2D(std::initializer_list<LB_Coord2D> list);
 
-    double offsetx = 0;
-    double offsety = 0;
-
     double X() const {
         return x;
     }
@@ -68,6 +65,8 @@ public:
 
     bool IsRectangle(double tolerance = FLOAT_TOL);
 
+    // given two polygons that touch at at least one point, but do not intersect. Return the outer perimeter of both polygons as a single continuous polygon
+    // A and B must have the same winding direction
     LB_Polygon2D United(const LB_Polygon2D &other) const;
 
 private:    

@@ -1,5 +1,4 @@
 #include "NestThread.h"
-#include <QDebug>
 
 NestThread::NestThread(QObject *parent) : QThread(parent)
 {    
@@ -10,18 +9,18 @@ void NestThread::run()
     // 1.let polygons in an order
     SortByAreaDecreasing();
 
-    m_stripNb = 0;
-    QVector<LB_Polygon2D> unPlaced = m_polygons;
+    int stripNb = 0;
+    QVector<LB_Polygon2D> unPlaced = polygons;
     QVector<LB_Polygon2D> operate;
 
     while(!unPlaced.isEmpty())
     {
-        m_stripNb++;
+        stripNb++;
         emit AddStrip();
 
         // 2.set the first locatioin
         unPlaced[0].SetLocation(0,0);
-        unPlaced[0].SetID(m_stripNb-1);
+        unPlaced[0].SetID(stripNb-1);
         emit AddItem(unPlaced[0]);
 
         LB_Polygon2D last = unPlaced[0];
@@ -38,7 +37,7 @@ void NestThread::run()
             }
 
             LB_Polygon2D &orb = unPlaced[i];
-            QVector<LB_Polygon2D> NFPS = noFitPolygon(last,orb,false,false);
+            QVector<LB_Polygon2D> NFPS = NoFitPolygon(last,orb,false,false);
             LB_Polygon2D nfp;
             if(!NFPS.isEmpty()) {
                 nfp = NFPS.takeFirst();
@@ -50,13 +49,13 @@ void NestThread::run()
 
             // iterate the nfp, to find the most left position to place the polygon
             int leftIndex = -1;
-            int left = m_stripWidth;
+            int left = stripWidth;
             for(int i=0;i<nfp.size();++i) {
                 orb.SetPosition(nfp[i],0);
-                if(orb.X()<0 || orb.X()+orb.Width()>m_stripWidth)
+                if(orb.X()<0 || orb.X()+orb.Width()>stripWidth)
                     continue;
 
-                if(orb.Y()<0 || orb.Y()+orb.Height()>m_stripHeight)
+                if(orb.Y()<0 || orb.Y()+orb.Height()>stripHeight)
                     continue;
 
                 if(orb.X()<left)
@@ -68,7 +67,7 @@ void NestThread::run()
 
             if(leftIndex != -1) {
                 orb.SetPosition(nfp[leftIndex],0);
-                orb.SetID(m_stripNb-1);
+                orb.SetID(stripNb-1);
                 emit AddItem(orb);
 
                 // get the hull of the polygons which have been placed
@@ -92,8 +91,8 @@ void NestThread::run()
 
 void NestThread::SetStripSize(double width, double height)
 {
-    m_stripWidth = width;
-    m_stripHeight = height;
+    stripWidth = width;
+    stripHeight = height;
 }
 
 void NestThread::PauseNest()
@@ -113,42 +112,42 @@ void NestThread::ResumeNest()
 
 void NestThread::SortByWidthDecreasing()
 {
-    for(int ctr = 0; ctr < m_polygons.size(); ++ctr)
+    for(int ctr = 0; ctr < polygons.size(); ++ctr)
     {
-        double maxWid = m_polygons[ctr].Bounds().Width();
+        double maxWid = polygons[ctr].Bounds().Width();
         int maxIndex = ctr;
-        for(int ctr2 = ctr + 1; ctr2 < m_polygons.size(); ++ctr2)
+        for(int ctr2 = ctr + 1; ctr2 < polygons.size(); ++ctr2)
         {
-            double wid = m_polygons[ctr2].Bounds().Width();
+            double wid = polygons[ctr2].Bounds().Width();
             if(wid > maxWid)
             {
                 maxWid = wid;
                 maxIndex = ctr2;
             }
         }
-        LB_Polygon2D temp = m_polygons[ctr];
-        m_polygons[ctr] = m_polygons[maxIndex];
-        m_polygons[maxIndex] = temp;
+        LB_Polygon2D temp = polygons[ctr];
+        polygons[ctr] = polygons[maxIndex];
+        polygons[maxIndex] = temp;
     }
 }
 
 void NestThread::SortByAreaDecreasing()
 {
-    for(int ctr = 0; ctr < m_polygons.size(); ++ctr)
+    for(int ctr = 0; ctr < polygons.size(); ++ctr)
     {
-        double maxArea = abs(m_polygons[ctr].Area());
+        double maxArea = abs(polygons[ctr].Area());
         int maxIndex = ctr;
-        for(int ctr2 = ctr + 1; ctr2 < m_polygons.size(); ++ctr2)
+        for(int ctr2 = ctr + 1; ctr2 < polygons.size(); ++ctr2)
         {
-            double area = abs(m_polygons[ctr2].Area());
+            double area = abs(polygons[ctr2].Area());
             if(area > maxArea)
             {
                 maxArea = area;
                 maxIndex = ctr2;
             }
         }
-        LB_Polygon2D temp = m_polygons[ctr];
-        m_polygons[ctr] = m_polygons[maxIndex];
-        m_polygons[maxIndex] = temp;
+        LB_Polygon2D temp = polygons[ctr];
+        polygons[ctr] = polygons[maxIndex];
+        polygons[maxIndex] = temp;
     }
 }

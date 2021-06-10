@@ -2,16 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QRandomGenerator>
-#include <QTextStream>
-#include <QFile>
-#include <QFileDialog>
 #include <QWheelEvent>
-#include <QGraphicsPolygonItem>
-#include <QGraphicsRectItem>
-#include <QThread>
 
-#include "util/NestThread.h"
+#include "NestThread.h"
 #include "Strip.h"
 
 namespace Ui {
@@ -35,28 +28,24 @@ private slots:
     void on_action_pause_triggered();
     void on_action_resume_triggered();
 
-    void onAddItem(LB_Polygon2D poly);
-    void onAddStrip();
     void onNestEnd();    
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
-    void zoom(int steps);
-
-    QColor randomColor();
-    LB_Polygon2D randomPolygon();
-    int randInt(const int &min, const int &max);
+    void zoom(int steps);       
 
 private:
     Ui::MainWindow *ui;
     const int mapWidth;
     const int mapHeight;
-    double totalArea;
+    double totalArea;    
 
     QVector<LB_Polygon2D> srcPolys;
 
     Strip *strip;
-    NestThread *nestThread;
+    NestThread *nestThread;    
+
+    LB_Polygon2D randomPolygon();
 
     QVector<LB_Polygon2D> loadPolygons(const QString &fileName);
 

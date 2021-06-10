@@ -129,6 +129,9 @@ public:
         return true;
     }
 
+    // returns the intersection of AB and EF
+    // or null if there are no intersections or other numerical error
+    // if the infinite flag is set, AE and EF describe infinite lines without endpoints, they are finite line segments otherwise
     static LB_Coord2D LineIntersect(const LB_Coord2D& A,const LB_Coord2D& B,const LB_Coord2D& E,const LB_Coord2D& F, bool infinite = false) {
         double a1, a2, b1, b2, c1, c2, x, y;
 

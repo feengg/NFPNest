@@ -4,23 +4,18 @@ CONFIG += c++11
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
+include($$PWD/nest/LB_Nest.pri)
+
 HEADERS += \
+    NestThread.h \
     Strip.h \
-    mainwindow.h \
-    util/LB_BaseUtil.h \
-    util/LB_Coord2D.h \
-    util/LB_NFPHandle.h \
-    util/LB_Polygon2D.h \
-    util/LB_Rect2D.h \
-    util/NestThread.h
+    mainwindow.h
 
 SOURCES += \
+    NestThread.cpp \
     Strip.cpp \
     main.cpp \
-    mainwindow.cpp \
-    util/LB_NFPHandle.cpp \
-    util/LB_Polygon2D.cpp \
-    util/NestThread.cpp
+    mainwindow.cpp
 	
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
