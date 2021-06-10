@@ -145,16 +145,16 @@ LB_Polygon2D MainWindow::randomPolygon()
     int y1, y2;
     int trySize = 0;
 
-    int generateDistance = randInt(MIN_GENERATE_DISTANCE,MAX_GENERATE_DISTANCE);
+    int generateDistance = RandInt(MIN_GENERATE_DISTANCE,MAX_GENERATE_DISTANCE);
 
     LB_Polygon2D polygon;
     QVector<QLineF> lines;
 
-    x1 = randInt(0,mapWidth / 3);
-    y1 = randInt(0,mapHeight / 3);
+    x1 = RandInt(0,mapWidth / 3);
+    y1 = RandInt(0,mapHeight / 3);
 
-    x2 = randInt(x1,mapWidth / 3);
-    y2 = randInt(0,y1);
+    x2 = RandInt(x1,mapWidth / 3);
+    y2 = RandInt(0,y1);
 
     QLineF line;
     line.setP1(QPointF(x1,y1));
@@ -171,8 +171,8 @@ LB_Polygon2D MainWindow::randomPolygon()
 
     do
     {
-        x2 = randInt(lastPoint.x() - generateDistance,lastPoint.x() + generateDistance);
-        y2 = randInt(lastPoint.y() - generateDistance,lastPoint.y() + generateDistance);
+        x2 = RandInt(lastPoint.x() - generateDistance,lastPoint.x() + generateDistance);
+        y2 = RandInt(lastPoint.y() - generateDistance,lastPoint.y() + generateDistance);
         line.setP2(QPointF(x2,y2));
 
         angle = line.angleTo(lines.last());
@@ -203,8 +203,8 @@ LB_Polygon2D MainWindow::randomPolygon()
                         return poly;
                     }
                     isIntersect = false;
-                    x2 = randInt(lastPoint.x() - generateDistance,lastPoint.x() + generateDistance);
-                    y2 = randInt(lastPoint.y() - generateDistance,lastPoint.y() + generateDistance);
+                    x2 = RandInt(lastPoint.x() - generateDistance,lastPoint.x() + generateDistance);
+                    y2 = RandInt(lastPoint.y() - generateDistance,lastPoint.y() + generateDistance);
 
                     line.setP2(QPointF(x2,y2));
                     for(int ctr2 = 0; ctr2 < lines.size()-1; ++ctr2)
@@ -234,8 +234,7 @@ LB_Polygon2D MainWindow::randomPolygon()
         LB_Coord2D aPnt(lines.at(ctr).p1().x(),
                    lines.at(ctr).p1().y());
         polygon.push_back(aPnt);
-    }
-    polygon.push_back(polygon[0]);// append the first vertex to make it close
+    }    
 
     return polygon;
 }
@@ -264,7 +263,6 @@ QVector<LB_Polygon2D> MainWindow::loadPolygons(const QString &fileName)
                 double y = coordinates[1].toDouble();
                 aPoly.push_back(LB_Coord2D(x,y));
             }
-            aPoly.push_back(aPoly[0]);
             input.push_back(aPoly);
         }
     }
@@ -275,8 +273,4 @@ QVector<LB_Polygon2D> MainWindow::loadPolygons(const QString &fileName)
 
 void MainWindow::test()
 {
-    LB_Polygon2D A = randomPolygon();
-    LB_Polygon2D B = A.Expand(2);
-    stripScene->AddOneItem(A);
-    stripScene->AddOneItem(B);
 }

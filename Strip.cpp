@@ -104,7 +104,7 @@ void Strip::AddOneItem(LB_Polygon2D poly)
     // add the item
     QGraphicsPolygonItem *anItem = new QGraphicsPolygonItem(target);
     anItem->setPen(Qt::NoPen);
-    anItem->setBrush(randomColor());
+    anItem->setBrush(RandomColor());
     anItem->setFlags(QGraphicsItem::ItemIsMovable);
     addItem(anItem);
 }

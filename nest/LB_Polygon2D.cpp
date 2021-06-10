@@ -1,4 +1,6 @@
 #include "LB_Polygon2D.h"
+#include <QDebug>
+
 namespace Shape2D {
 
 LB_Polygon2D::LB_Polygon2D(std::initializer_list<LB_Coord2D> list) : QVector<LB_Coord2D>(list)
@@ -11,6 +13,16 @@ LB_Polygon2D::LB_Polygon2D(std::initializer_list<LB_Coord2D> list) : QVector<LB_
     y = bounds.Y();
     width = bounds.Width();
     height = bounds.Height();
+}
+
+QString LB_Polygon2D::ToString() const
+{
+    QString str("Polygon:[");
+    foreach(LB_Coord2D pnt,*this) {
+        str += pnt.ToString();
+    }
+    str += "];";
+    return str;
 }
 
 double LB_Polygon2D::Area() const
@@ -508,38 +520,36 @@ LB_Polygon2D LB_Polygon2D::United(const LB_Polygon2D &other) const
         }
     }
 
+    C.SetID(stripID);
     return C;
 }
 
-LB_Polygon2D LB_Polygon2D::Expand(double offset) const
+LB_Polygon2D LB_Polygon2D::Shrinking(double offset) const
 {
-    // 1. Determine if it is clockwise
-    if (IsAntiClockWise()) {
-        offset = -offset;
-    }
+    // https://blog.csdn.net/hjk61314/article/details/82112610
+    // if polygon is closed, remove the head or the end to avoid NAN sin_alpha
+    LB_Polygon2D poly(*this);
+    if(poly.first() == poly.last())
+        poly.remove(0);
 
-    // 2. edge set and normalize it
-    QVector<LB_Coord2D> dpList, ndpList;
-    int count = size();
-    for (int i = 0; i < count; i++) {
-        int next = (i == (count - 1) ? 0 : (i + 1));
-        dpList.push_back(at(next) - at(i));
-        float unitLen = 1.0f / sqrt(dpList.at(i).Dot(dpList.at(i)));
-        ndpList.push_back(dpList.at(i) * unitLen);
-    }
-
-    // 3. compute Line
     LB_Polygon2D result;
-    for (int i = 0; i < count; i++) {
-        int startIndex = (i == 0 ? (count - 1) : (i - 1));
-        int endIndex = i;
-        double sinTheta = ndpList.at(startIndex).Cross(ndpList.at(endIndex));
-        LB_Coord2D orientVector = ndpList.at(endIndex) - ndpList.at(startIndex);//i.e. PV2-V1P=PV2+PV1
-        LB_Coord2D temp_out;
-        temp_out.RX() = at(i).X() + offset / sinTheta * orientVector.X();
-        temp_out.RY() = at(i).Y() + offset / sinTheta * orientVector.Y();
-        result.push_back(temp_out);
+    int preIndex,nextIndex;
+    for(int i=0;i<poly.size();++i) {
+        preIndex = (i==0) ? (poly.size()-1) : i-1;
+        nextIndex = (i+1)%poly.size();
+
+        LB_Coord2D p = poly.at(i);
+        LB_Coord2D lp = poly.at(preIndex);
+        LB_Coord2D np = poly.at(nextIndex);
+
+        LB_Coord2D V1 = p-lp;
+        LB_Coord2D V2 = p-np;
+        LB_Coord2D NV1 = V1.Normalized();
+        LB_Coord2D NV2 = V2.Normalized();
+        double sin_alpha = NV1.Cross(NV2);
+        result.append(p + (NV1+NV2)*(offset/sin_alpha));
     }
+    result.SetID(stripID);
     return result;
 }
 

@@ -1,6 +1,8 @@
 #ifndef LB_COORD2D_H
 #define LB_COORD2D_H
 
+#include <QString>
+
 #include "LB_BaseUtil.h"
 using namespace BaseUtil;
 
@@ -28,6 +30,9 @@ public:
     }
     LB_Coord2D operator*(double val) const {
         return LB_Coord2D{x*val,y*val};
+    }
+    QString ToString() const {
+        return QString("Coord:(%1,%2);").arg(x).arg(y);;
     }
 
     double Dot(const LB_Coord2D& other) const {

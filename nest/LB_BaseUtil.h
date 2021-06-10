@@ -17,14 +17,14 @@ static bool FuzzyEqual(double a, double b, double tolerance = FLOAT_TOL) {
     return fabs(a-b) < tolerance;
 }
 
-static int randInt(const int &min, const int &max) {
+static int RandInt(const int &min, const int &max) {
      return QRandomGenerator::global()->bounded(min,max);
 }
 
-static QColor randomColor() {
+static QColor RandomColor() {
     int rand[3] = {0};
     for(int i=0;i<3;++i)
-        rand[i] = randInt(0,255);
+        rand[i] = RandInt(0,255);
 
     return QColor(rand[0],rand[1],rand[2]);
 }

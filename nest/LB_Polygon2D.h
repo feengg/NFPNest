@@ -38,6 +38,7 @@ public:
     void SetID(int val) {
         stripID = val;
     }
+    QString ToString() const;
 
     double Area() const;
 
@@ -70,7 +71,7 @@ public:
     // A and B must have the same winding direction
     LB_Polygon2D United(const LB_Polygon2D &other) const;
 
-    LB_Polygon2D Expand(double offset) const;
+    LB_Polygon2D Shrinking(double offset) const;
 
 private:    
     double x = 0;
