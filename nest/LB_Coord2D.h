@@ -30,6 +30,13 @@ public:
         return LB_Coord2D{x*val,y*val};
     }
 
+    double Dot(const LB_Coord2D& other) const {
+        return x*other.x + y*other.y;
+    }
+    double Cross(const LB_Coord2D& other) const {
+        return x*other.y - y*other.x;
+    }
+
     double X() const {
         return x;
     }

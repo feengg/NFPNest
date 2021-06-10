@@ -2,6 +2,7 @@
 
 #include <QGraphicsPolygonItem>
 #include <QGraphicsRectItem>
+#include <QPainter>
 
 Strip::Strip(double width, double height) : stripWidth(width), stripHeight(height), stripNb(0)
 {
@@ -70,6 +71,15 @@ double Strip::GetUtilization(int index) const
     return stripUsed[index];
 }
 
+QImage Strip::DumpToImage()
+{
+    QImage result(sceneRect().size().toSize(),QImage::Format_ARGB32);
+    QPainter aPainter(&result);
+    aPainter.setRenderHints(aPainter.renderHints() | QPainter::Antialiasing);
+    this->render(&aPainter);
+    return result;
+}
+
 void Strip::AddOneStrip()
 {
     stripNb++;
@@ -93,7 +103,7 @@ void Strip::AddOneItem(LB_Polygon2D poly)
 
     // add the item
     QGraphicsPolygonItem *anItem = new QGraphicsPolygonItem(target);
-    anItem->setPen(QColor(Qt::gray));
+    anItem->setPen(Qt::NoPen);
     anItem->setBrush(randomColor());
     anItem->setFlags(QGraphicsItem::ItemIsMovable);
     addItem(anItem);

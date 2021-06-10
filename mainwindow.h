@@ -42,7 +42,7 @@ private:
 
     QVector<LB_Polygon2D> srcPolys;
 
-    Strip *strip;
+    Strip *stripScene;
     NestThread *nestThread;    
 
     LB_Polygon2D randomPolygon();

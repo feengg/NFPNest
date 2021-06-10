@@ -88,6 +88,34 @@ LB_Rect2D LB_Polygon2D::Bounds() const
                      ymax-ymin);
 }
 
+int LB_Polygon2D::RotateToMinBndRect()
+{
+    double width = this->Bounds().Width();
+    double height = this->Bounds().Height();
+    double area = width * height;
+    double minArea = area;
+
+    int minDegree = 0;
+
+    for(int degree = 1; degree < 90; ++degree)
+    {
+        this->Rotate(1);
+        width = this->Bounds().Width();
+        height = this->Bounds().Height();
+
+        area = width * height;
+        if(area < minArea)
+        {
+            minArea = area;
+            minDegree = degree;
+        }
+    }
+    this->Rotate(minDegree - 89);
+
+    return minDegree;
+
+}
+
 void LB_Polygon2D::SetLocation(double px, double py)
 {
     LB_Rect2D bnd = Bounds();
@@ -481,6 +509,38 @@ LB_Polygon2D LB_Polygon2D::United(const LB_Polygon2D &other) const
     }
 
     return C;
+}
+
+LB_Polygon2D LB_Polygon2D::Expand(double offset) const
+{
+    // 1. Determine if it is clockwise
+    if (IsAntiClockWise()) {
+        offset = -offset;
+    }
+
+    // 2. edge set and normalize it
+    QVector<LB_Coord2D> dpList, ndpList;
+    int count = size();
+    for (int i = 0; i < count; i++) {
+        int next = (i == (count - 1) ? 0 : (i + 1));
+        dpList.push_back(at(next) - at(i));
+        float unitLen = 1.0f / sqrt(dpList.at(i).Dot(dpList.at(i)));
+        ndpList.push_back(dpList.at(i) * unitLen);
+    }
+
+    // 3. compute Line
+    LB_Polygon2D result;
+    for (int i = 0; i < count; i++) {
+        int startIndex = (i == 0 ? (count - 1) : (i - 1));
+        int endIndex = i;
+        double sinTheta = ndpList.at(startIndex).Cross(ndpList.at(endIndex));
+        LB_Coord2D orientVector = ndpList.at(endIndex) - ndpList.at(startIndex);//i.e. PV2-V1P=PV2+PV1
+        LB_Coord2D temp_out;
+        temp_out.RX() = at(i).X() + offset / sinTheta * orientVector.X();
+        temp_out.RY() = at(i).Y() + offset / sinTheta * orientVector.Y();
+        result.push_back(temp_out);
+    }
+    return result;
 }
 
 }

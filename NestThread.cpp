@@ -7,6 +7,7 @@ NestThread::NestThread(QObject *parent) : QThread(parent)
 void NestThread::run()
 {
     // 1.let polygons in an order
+    RotateToMinBounds();
     SortByAreaDecreasing();
 
     int stripNb = 0;
@@ -149,5 +150,12 @@ void NestThread::SortByAreaDecreasing()
         LB_Polygon2D temp = polygons[ctr];
         polygons[ctr] = polygons[maxIndex];
         polygons[maxIndex] = temp;
+    }
+}
+
+void NestThread::RotateToMinBounds()
+{
+    for(int ctr = 0; ctr < polygons.size(); ++ctr) {
+        polygons[ctr].RotateToMinBndRect();
     }
 }

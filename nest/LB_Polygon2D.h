@@ -44,6 +44,7 @@ public:
     void Rotate(double angle);
     void Translate(double dx, double dy);
     LB_Rect2D Bounds() const;
+    int RotateToMinBndRect();
 
     void SetLocation(double px, double py);
     void SetLocation(const LB_Coord2D &pnt);
@@ -68,6 +69,8 @@ public:
     // given two polygons that touch at at least one point, but do not intersect. Return the outer perimeter of both polygons as a single continuous polygon
     // A and B must have the same winding direction
     LB_Polygon2D United(const LB_Polygon2D &other) const;
+
+    LB_Polygon2D Expand(double offset) const;
 
 private:    
     double x = 0;

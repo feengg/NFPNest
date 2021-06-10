@@ -28,6 +28,8 @@ public:
     int GetUsedNumber() const;
     double GetUtilization(int index) const;
 
+    QImage DumpToImage();
+
 public slots:
     void AddOneStrip();
     void AddOneItem(LB_Polygon2D poly);

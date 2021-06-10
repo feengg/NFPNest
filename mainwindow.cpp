@@ -20,15 +20,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     qRegisterMetaType<LB_Polygon2D>("LB_Polygon2D");
-    strip = new Strip(mapWidth,mapHeight);
+    stripScene = new Strip(mapWidth,mapHeight);
     nestThread = new NestThread(this);
-    connect(nestThread,&NestThread::AddItem,strip,&Strip::AddOneItem);
-    connect(nestThread,&NestThread::AddStrip,strip,&Strip::AddOneStrip);
+    connect(nestThread,&NestThread::AddItem,stripScene,&Strip::AddOneItem);
+    connect(nestThread,&NestThread::AddStrip,stripScene,&Strip::AddOneStrip);
     connect(nestThread,&NestThread::NestEnd,this,&MainWindow::onNestEnd);
 
     ui->label_stripWidth->setText(tr("Strip width:%1").arg(mapWidth));
     ui->label_stripHeight->setText(tr("Strip height:%1").arg(mapHeight));
-    ui->graphicsView_result->setScene(strip);    
+    ui->graphicsView_result->setScene(stripScene);
 }
 
 MainWindow::~MainWindow()
@@ -53,7 +53,13 @@ void MainWindow::on_action_openFile_triggered()
 }
 
 void MainWindow::on_action_saveResult_triggered()
-{    
+{
+    QString pixName = QFileDialog::getSaveFileName(this,tr("save"),"","*.bmp *.png *.jpg");
+    if(pixName.isEmpty())
+        return;
+
+    QImage img = stripScene->DumpToImage();
+    img.save(pixName);
 }
 
 void MainWindow::on_action_solve_triggered()
@@ -70,7 +76,7 @@ void MainWindow::on_action_solve_triggered()
 
 void MainWindow::on_action_reset_triggered()
 {
-    strip->Reset();
+    stripScene->Reset();
     totalArea = 0;
     srcPolys.clear();    
 
@@ -119,14 +125,14 @@ void MainWindow::on_action_resume_triggered()
 
 void MainWindow::onNestEnd()
 {
-    int stripNb = strip->GetUsedNumber();
+    int stripNb = stripScene->GetUsedNumber();
     ui->label_stripNb->setText((tr("Used strip number:%1").arg(stripNb)));
     // Statistics
     double anArea = 0;
     ui->label_utilizationRate->clear();
     QString content;
     for(int i=0;i<stripNb;++i) {
-        anArea = strip->GetUtilization(i);
+        anArea = stripScene->GetUtilization(i);
         content.append(tr("Strip %1 Utilization rate:%2 % \n").arg(i).arg(100*anArea/(mapWidth*mapHeight)));
     }
     ui->label_utilizationRate->setText(content);
@@ -269,4 +275,8 @@ QVector<LB_Polygon2D> MainWindow::loadPolygons(const QString &fileName)
 
 void MainWindow::test()
 {
+    LB_Polygon2D A = randomPolygon();
+    LB_Polygon2D B = A.Expand(2);
+    stripScene->AddOneItem(A);
+    stripScene->AddOneItem(B);
 }

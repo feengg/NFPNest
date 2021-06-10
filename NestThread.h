@@ -32,6 +32,7 @@ public:
 protected:
     void SortByWidthDecreasing();
     void SortByAreaDecreasing();
+    void RotateToMinBounds();
 
 private:
     double stripWidth;
