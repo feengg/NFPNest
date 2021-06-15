@@ -1,13 +1,22 @@
-#include "NestThread.h"
+#include "LB_NestThread.h"
+#include "LB_NestConfig.h"
+using namespace NestConfig;
 
-NestThread::NestThread(QObject *parent) : QThread(parent)
+LB_NestThread::LB_NestThread(QObject *parent) : QThread(parent)
 {    
 }
 
-void NestThread::run()
+void LB_NestThread::run()
 {
     // 1.let polygons in an order
-    RotateToMinBounds();
+    if(ENABLE_ROTATION)
+        RotateToMinBounds();
+    if(ITEM_GAP != 0) {
+        for(int ctr = 0; ctr < polygons.size(); ++ctr) {
+            polygons[ctr] = polygons[ctr].Shrinking(-ITEM_GAP);
+        }
+    }
+
     SortByAreaDecreasing();
 
     int stripNb = 0;
@@ -50,13 +59,13 @@ void NestThread::run()
 
             // iterate the nfp, to find the most left position to place the polygon
             int leftIndex = -1;
-            int left = stripWidth;
+            int left = STRIP_WIDTH;
             for(int i=0;i<nfp.size();++i) {
                 orb.SetPosition(nfp[i],0);
-                if(orb.X()<0 || orb.X()+orb.Width()>stripWidth)
+                if(orb.X()<0 || orb.X()+orb.Width()>STRIP_WIDTH)
                     continue;
 
-                if(orb.Y()<0 || orb.Y()+orb.Height()>stripHeight)
+                if(orb.Y()<0 || orb.Y()+orb.Height()>STRIP_HEIGHT)
                     continue;
 
                 if(orb.X()<left)
@@ -90,19 +99,13 @@ void NestThread::run()
     emit NestEnd();
 }
 
-void NestThread::SetStripSize(double width, double height)
-{
-    stripWidth = width;
-    stripHeight = height;
-}
-
-void NestThread::PauseNest()
+void LB_NestThread::PauseNest()
 {
     if(isRunning())
         doNestWait = true;
 }
 
-void NestThread::ResumeNest()
+void LB_NestThread::ResumeNest()
 {
     if(isRunning())
     {
@@ -111,7 +114,7 @@ void NestThread::ResumeNest()
     }
 }
 
-void NestThread::SortByWidthDecreasing()
+void LB_NestThread::SortByWidthDecreasing()
 {
     for(int ctr = 0; ctr < polygons.size(); ++ctr)
     {
@@ -132,7 +135,7 @@ void NestThread::SortByWidthDecreasing()
     }
 }
 
-void NestThread::SortByAreaDecreasing()
+void LB_NestThread::SortByAreaDecreasing()
 {
     for(int ctr = 0; ctr < polygons.size(); ++ctr)
     {
@@ -153,7 +156,7 @@ void NestThread::SortByAreaDecreasing()
     }
 }
 
-void NestThread::RotateToMinBounds()
+void LB_NestThread::RotateToMinBounds()
 {
     for(int ctr = 0; ctr < polygons.size(); ++ctr) {
         polygons[ctr].RotateToMinBndRect();

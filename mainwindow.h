@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include <QWheelEvent>
 
-#include "NestThread.h"
+#include "nest/LB_NestThread.h"
 #include "Strip.h"
+#include "NestConfigWidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,8 +28,9 @@ private slots:
     void on_action_test_triggered();
     void on_action_pause_triggered();
     void on_action_resume_triggered();
+    void on_action_setting_triggered();
 
-    void onNestEnd();    
+    void onNestEnd();
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
@@ -36,14 +38,14 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    const int mapWidth;
-    const int mapHeight;
+
     double totalArea;    
 
     QVector<LB_Polygon2D> srcPolys;
 
     Strip *stripScene;
-    NestThread *nestThread;    
+    LB_NestThread *nestThread;
+    NestConfigWidget *configWid;
 
     LB_Polygon2D randomPolygon();
 

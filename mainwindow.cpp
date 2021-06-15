@@ -6,6 +6,8 @@
 #include <QFileDialog>
 #include <QDebug>
 
+#include "NestConfigWidget.h"
+
 #define GENERATE_RESET 100000
 #define MAX_GENERATE_DISTANCE 150
 #define MIN_GENERATE_DISTANCE 50
@@ -13,21 +15,25 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    mapWidth(1000),
-    mapHeight(1000)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
     qRegisterMetaType<LB_Polygon2D>("LB_Polygon2D");
-    stripScene = new Strip(mapWidth,mapHeight);
-    nestThread = new NestThread(this);
-    connect(nestThread,&NestThread::AddItem,stripScene,&Strip::AddOneItem);
-    connect(nestThread,&NestThread::AddStrip,stripScene,&Strip::AddOneStrip);
-    connect(nestThread,&NestThread::NestEnd,this,&MainWindow::onNestEnd);
 
-    ui->label_stripWidth->setText(tr("Strip width:%1").arg(mapWidth));
-    ui->label_stripHeight->setText(tr("Strip height:%1").arg(mapHeight));
+    stripScene = new Strip;
+    nestThread = new LB_NestThread(this);
+    configWid = new NestConfigWidget(this);
+
+    connect(nestThread,&LB_NestThread::AddItem,stripScene,&Strip::AddOneItem);
+    connect(nestThread,&LB_NestThread::AddStrip,stripScene,&Strip::AddOneStrip);
+    connect(nestThread,&LB_NestThread::NestEnd,this,&MainWindow::onNestEnd);
+    connect(configWid,&QDialog::accepted,this,[=]() {
+        ui->label_stripWidth->setText(tr("Strip width:%1").arg(stripScene->getStripWidth()));
+        ui->label_stripHeight->setText(tr("Strip height:%1").arg(stripScene->getStripHeight()));
+        stripScene->InitSize();
+    });
+
     ui->graphicsView_result->setScene(stripScene);
 }
 
@@ -64,7 +70,7 @@ void MainWindow::on_action_saveResult_triggered()
 
 void MainWindow::on_action_solve_triggered()
 {
-    nestThread->SetStripSize(mapWidth,mapHeight);
+    stripScene->InitSize();
 
     if(srcPolys.isEmpty())
         return;
@@ -123,6 +129,11 @@ void MainWindow::on_action_resume_triggered()
     nestThread->ResumeNest();
 }
 
+void MainWindow::on_action_setting_triggered()
+{
+    configWid->show();
+}
+
 void MainWindow::onNestEnd()
 {
     int stripNb = stripScene->GetUsedNumber();
@@ -133,7 +144,7 @@ void MainWindow::onNestEnd()
     QString content;
     for(int i=0;i<stripNb;++i) {
         anArea = stripScene->GetUtilization(i);
-        content.append(tr("Strip %1 Utilization rate:%2 % \n").arg(i).arg(100*anArea/(mapWidth*mapHeight)));
+        content.append(tr("Strip %1 Utilization rate:%2 % \n").arg(i).arg(100*anArea/(stripScene->getStripWidth()*stripScene->getStripHeight())));
     }
     ui->label_utilizationRate->setText(content);
 }
@@ -150,10 +161,10 @@ LB_Polygon2D MainWindow::randomPolygon()
     LB_Polygon2D polygon;
     QVector<QLineF> lines;
 
-    x1 = RandInt(0,mapWidth / 3);
-    y1 = RandInt(0,mapHeight / 3);
+    x1 = RandInt(0,stripScene->getStripWidth() / 3);
+    y1 = RandInt(0,stripScene->getStripHeight() / 3);
 
-    x2 = RandInt(x1,mapWidth / 3);
+    x2 = RandInt(x1,stripScene->getStripWidth() / 3);
     y2 = RandInt(0,y1);
 
     QLineF line;

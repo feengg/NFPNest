@@ -1,6 +1,6 @@
 #include "LB_NFPHandle.h"
 
-namespace LB_NFP {
+namespace NFPHandle {
 
 double PointDistance(const LB_Coord2D &p, const LB_Coord2D &s1, const LB_Coord2D &s2, LB_Coord2D normal, bool infinite)
 {

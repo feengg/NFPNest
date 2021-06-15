@@ -1,23 +1,21 @@
-#ifndef NESTTHREAD_H
-#define NESTTHREAD_H
+#ifndef LB_NESTTHREAD_H
+#define LB_NESTTHREAD_H
 
 #include <QThread>
 #include <QWaitCondition>
 #include <QMutex>
 
-#include "nest/LB_NFPHandle.h"
-using namespace LB_NFP;
+#include "LB_NFPHandle.h"
+using namespace NFPHandle;
 using namespace Shape2D;
 
-class NestThread : public QThread
+class LB_NestThread : public QThread
 {
     Q_OBJECT
 public:
-    explicit NestThread(QObject *parent);
+    explicit LB_NestThread(QObject *parent);
 
     void run() override;
-
-    void SetStripSize(double width, double height);
 
     void SetPolygons(const QVector<LB_Polygon2D> &polygonVec) {
         polygons = polygonVec;
@@ -35,8 +33,6 @@ protected:
     void RotateToMinBounds();
 
 private:
-    double stripWidth;
-    double stripHeight;
     QVector<LB_Polygon2D> polygons;
 
     bool doNestWait = false;
@@ -49,4 +45,4 @@ signals:
     void NestEnd();
 };
 
-#endif // NESTTHREAD_H
+#endif // LB_NESTTHREAD_H

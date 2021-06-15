@@ -4,21 +4,11 @@
 #include <QGraphicsRectItem>
 #include <QPainter>
 
-Strip::Strip(double width, double height) : stripWidth(width), stripHeight(height), stripNb(0)
-{
-    this->setSceneRect(0,0,width,height);
-}
+#include "nest/LB_NestConfig.h"
+using namespace NestConfig;
 
-void Strip::setSceneWidth(double width)
-{
-    double height = this->sceneRect().height();
-    this->setSceneRect(0,0,width, height);
-}
-
-void Strip::setSceneHeight(double height)
-{
-    double width = this->sceneRect().width();
-    this->setSceneRect(0,0,width, height);
+Strip::Strip() : stripNb(0)
+{    
 }
 
 double Strip::getSceneWidth() const
@@ -31,34 +21,29 @@ double Strip::getSceneHeight() const
     return this->sceneRect().height();
 }
 
-void Strip::setStripWidth(double val)
-{
-    stripWidth = val;
-}
-
-void Strip::setStripHeight(double val)
-{
-    stripHeight = val;
-}
-
 double Strip::getStripWidth() const
 {
-    return stripWidth;
+    return STRIP_WIDTH;
 }
 
 double Strip::getStripHeight() const
 {
-    return stripHeight;
+    return STRIP_HEIGHT;
 }
 
 void Strip::Reset()
 {
     this->clear();
-    this->setSceneWidth(stripWidth);
+    InitSize();
     for(int i=0;i<stripNb;++i) {
         stripUsed[i] = 0;
     }
     stripNb = 0;
+}
+
+void Strip::InitSize()
+{
+    this->setSceneRect(0,0,STRIP_WIDTH,STRIP_HEIGHT);
 }
 
 int Strip::GetUsedNumber() const
@@ -83,11 +68,11 @@ QImage Strip::DumpToImage()
 void Strip::AddOneStrip()
 {
     stripNb++;
-    setSceneWidth(stripNb*stripWidth);
-    QGraphicsRectItem *rect = new QGraphicsRectItem(QRectF((stripNb-1)*stripWidth,
+    setSceneRect(0,0,stripNb*STRIP_WIDTH,STRIP_HEIGHT);
+    QGraphicsRectItem *rect = new QGraphicsRectItem(QRectF((stripNb-1)*STRIP_WIDTH,
                                                            0,
-                                                           stripWidth,
-                                                           stripHeight));
+                                                           STRIP_WIDTH,
+                                                           STRIP_HEIGHT));
     rect->setPen(QColor(Qt::red));
     addItem(rect);
 }
@@ -95,10 +80,14 @@ void Strip::AddOneStrip()
 void Strip::AddOneItem(LB_Polygon2D poly)
 {
     // add the area to array
+    if(ITEM_GAP != 0) {
+        poly = poly.Shrinking(ITEM_GAP);
+    }
+
     stripUsed[poly.ID()] += abs(poly.Area());
 
     // move the item to the correct strip
-    poly.Translate(poly.ID()*stripWidth,0);
+    poly.Translate(poly.ID()*STRIP_WIDTH,0);
     QPolygonF target = poly.ToPolygonF();
 
     // add the item

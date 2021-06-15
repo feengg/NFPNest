@@ -1,5 +1,4 @@
 #include "LB_Polygon2D.h"
-#include <QDebug>
 
 namespace Shape2D {
 

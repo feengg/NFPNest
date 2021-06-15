@@ -7,12 +7,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 include($$PWD/nest/LB_Nest.pri)
 
 HEADERS += \
-    NestThread.h \
+    NestConfigWidget.h \
     Strip.h \
     mainwindow.h
 
 SOURCES += \
-    NestThread.cpp \
+    NestConfigWidget.cpp \
     Strip.cpp \
     main.cpp \
     mainwindow.cpp
@@ -23,4 +23,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
+    NestConfigWidget.ui \
     mainwindow.ui

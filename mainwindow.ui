@@ -15,23 +15,26 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="2">
-     <widget class="QGroupBox" name="groupBox_resultInfo">
+    <item row="1" column="0" colspan="3">
+     <widget class="QGraphicsView" name="graphicsView_result"/>
+    </item>
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox_sceneInfo">
       <property name="title">
-       <string>Result info</string>
+       <string>Scene info</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2">
+      <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
-        <widget class="QLabel" name="label_stripNb">
+        <widget class="QLabel" name="label_stripWidth">
          <property name="text">
-          <string>Used strip number:XXX</string>
+          <string>Strip width:XXX</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_utilizationRate">
+        <widget class="QLabel" name="label_stripHeight">
          <property name="text">
-          <string>Utilization rate:XXX</string>
+          <string>Strip height:XXX</string>
          </property>
         </widget>
        </item>
@@ -61,31 +64,35 @@
       </layout>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox_sceneInfo">
+    <item row="0" column="2">
+     <widget class="QGroupBox" name="groupBox_resultInfo">
       <property name="title">
-       <string>Scene info</string>
+       <string>Result info</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_4">
+      <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
-        <widget class="QLabel" name="label_stripWidth">
+        <widget class="QLabel" name="label_stripNb">
          <property name="text">
-          <string>Strip width:XXX</string>
+          <string>Used strip number:XXX</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_stripHeight">
+        <widget class="QLabel" name="label_utilizationRate">
          <property name="text">
-          <string>Strip height:XXX</string>
+          <string>Utilization rate:XXX</string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
     </item>
-    <item row="1" column="0" colspan="3">
-     <widget class="QGraphicsView" name="graphicsView_result"/>
+    <item row="2" column="0" colspan="3">
+     <widget class="QProgressBar" name="progressBar_nest">
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -109,6 +116,7 @@
     <addaction name="action_test"/>
     <addaction name="action_pause"/>
     <addaction name="action_resume"/>
+    <addaction name="action_setting"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -146,6 +154,11 @@
   <action name="action_resume">
    <property name="text">
     <string>Resume</string>
+   </property>
+  </action>
+  <action name="action_setting">
+   <property name="text">
+    <string>Setting</string>
    </property>
   </action>
  </widget>

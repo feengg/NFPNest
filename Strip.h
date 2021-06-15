@@ -6,24 +6,19 @@
 #include "nest/LB_Polygon2D.h"
 using namespace Shape2D;
 
-const int MaxStripNb = 99;
-
 class Strip : public QGraphicsScene
 {
 public:
-    Strip(double width, double height);
+    Strip();
 
-    void setSceneWidth(double width);
-    void setSceneHeight(double height);
     double getSceneWidth() const;
     double getSceneHeight() const;
 
-    void setStripWidth(double val);
-    void setStripHeight(double val);
     double getStripWidth() const;
     double getStripHeight() const;
 
     void Reset();
+    void InitSize();
 
     int GetUsedNumber() const;
     double GetUtilization(int index) const;
@@ -35,10 +30,8 @@ public slots:
     void AddOneItem(LB_Polygon2D poly);
 
 private:
-    double stripWidth;
-    double stripHeight;
     int stripNb;
-    double stripUsed[MaxStripNb]={0};
+    double stripUsed[99]={0};
 };
 
 #endif // STRIP_H
