@@ -67,8 +67,8 @@ void NestConfigWidget::on_pushButton_cancle_clicked()
 
 void NestConfigWidget::apply()
 {
-    STRIP_WIDTH = ui->lineEdit_stripWidth->text().toDouble();
-    STRIP_HEIGHT = ui->lineEdit_stripHeight->text().toDouble();
-    ENABLE_ROTATION = 1-ui->comboBox_enableRotation->currentIndex();
-    ITEM_GAP = ui->lineEdit_itemGap->text().toDouble();
+    LB_NestConfig::STRIP_WIDTH = ui->lineEdit_stripWidth->text().toDouble();
+    LB_NestConfig::STRIP_HEIGHT = ui->lineEdit_stripHeight->text().toDouble();
+    LB_NestConfig::ENABLE_ROTATION = 1-ui->comboBox_enableRotation->currentIndex();
+    LB_NestConfig::ITEM_GAP = ui->lineEdit_itemGap->text().toDouble();
 }

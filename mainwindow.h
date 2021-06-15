@@ -39,6 +39,7 @@ protected:
 private:
     Ui::MainWindow *ui;
 
+    int arrangNb=0;
     double totalArea;    
 
     QVector<LB_Polygon2D> srcPolys;

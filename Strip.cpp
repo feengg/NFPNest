@@ -3,12 +3,18 @@
 #include <QGraphicsPolygonItem>
 #include <QGraphicsRectItem>
 #include <QPainter>
+#include <QDebug>
 
 #include "nest/LB_NestConfig.h"
 using namespace NestConfig;
 
+const double & stripWid = LB_NestConfig::STRIP_WIDTH;
+const double & stripHei = LB_NestConfig::STRIP_HEIGHT;
+const double & pieceGap = LB_NestConfig::ITEM_GAP;
+
 Strip::Strip() : stripNb(0)
-{    
+{
+    InitSize();
 }
 
 double Strip::getSceneWidth() const
@@ -23,12 +29,12 @@ double Strip::getSceneHeight() const
 
 double Strip::getStripWidth() const
 {
-    return STRIP_WIDTH;
+    return stripWid;
 }
 
 double Strip::getStripHeight() const
 {
-    return STRIP_HEIGHT;
+    return stripHei;
 }
 
 void Strip::Reset()
@@ -43,7 +49,7 @@ void Strip::Reset()
 
 void Strip::InitSize()
 {
-    this->setSceneRect(0,0,STRIP_WIDTH,STRIP_HEIGHT);
+    this->setSceneRect(0,0,stripWid,stripHei);
 }
 
 int Strip::GetUsedNumber() const
@@ -68,11 +74,11 @@ QImage Strip::DumpToImage()
 void Strip::AddOneStrip()
 {
     stripNb++;
-    setSceneRect(0,0,stripNb*STRIP_WIDTH,STRIP_HEIGHT);
-    QGraphicsRectItem *rect = new QGraphicsRectItem(QRectF((stripNb-1)*STRIP_WIDTH,
+    setSceneRect(0,0,stripNb*stripWid,stripHei);
+    QGraphicsRectItem *rect = new QGraphicsRectItem(QRectF((stripNb-1)*stripWid,
                                                            0,
-                                                           STRIP_WIDTH,
-                                                           STRIP_HEIGHT));
+                                                           stripWid,
+                                                           stripHei));
     rect->setPen(QColor(Qt::red));
     addItem(rect);
 }
@@ -80,14 +86,14 @@ void Strip::AddOneStrip()
 void Strip::AddOneItem(LB_Polygon2D poly)
 {
     // add the area to array
-    if(ITEM_GAP != 0) {
-        poly = poly.Shrinking(ITEM_GAP);
+    if(pieceGap != 0) {
+        poly = poly.Shrinking(pieceGap);
     }
 
     stripUsed[poly.ID()] += abs(poly.Area());
 
     // move the item to the correct strip
-    poly.Translate(poly.ID()*STRIP_WIDTH,0);
+    poly.Translate(poly.ID()*stripWid,0);
     QPolygonF target = poly.ToPolygonF();
 
     // add the item

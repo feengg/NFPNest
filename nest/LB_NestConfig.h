@@ -1,12 +1,23 @@
 #ifndef LB_NESTCONFIG_H
 #define LB_NESTCONFIG_H
 
+#include <QString>
+
 namespace NestConfig {
 
-    static double STRIP_WIDTH = 1000;
-    static double STRIP_HEIGHT = 1000;
-    static bool ENABLE_ROTATION = true;
-    static double ITEM_GAP = 0;
+class LB_NestConfig
+{
+public:
+    static double STRIP_WIDTH;
+    static double STRIP_HEIGHT;
+    static bool ENABLE_ROTATION;
+    static double ITEM_GAP;
+
+    static QString DumpConfig();
+
+private:
+    LB_NestConfig() {}
+};
 
 }
 

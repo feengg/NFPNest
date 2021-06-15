@@ -8,15 +8,21 @@ LB_NestThread::LB_NestThread(QObject *parent) : QThread(parent)
 
 void LB_NestThread::run()
 {
-    // 1.let polygons in an order
-    if(ENABLE_ROTATION)
+    // deal with config
+    const double & stripWid = LB_NestConfig::STRIP_WIDTH;
+    const double & stripHei = LB_NestConfig::STRIP_HEIGHT;
+    const double & itemGap = LB_NestConfig::ITEM_GAP;
+    const bool & enRotation = LB_NestConfig::ENABLE_ROTATION;
+
+    if(enRotation)
         RotateToMinBounds();
-    if(ITEM_GAP != 0) {
+    if(itemGap != 0) {
         for(int ctr = 0; ctr < polygons.size(); ++ctr) {
-            polygons[ctr] = polygons[ctr].Shrinking(-ITEM_GAP);
+            polygons[ctr] = polygons[ctr].Shrinking(-itemGap);
         }
     }
 
+    // 1.let polygons in an order
     SortByAreaDecreasing();
 
     int stripNb = 0;
@@ -59,13 +65,13 @@ void LB_NestThread::run()
 
             // iterate the nfp, to find the most left position to place the polygon
             int leftIndex = -1;
-            int left = STRIP_WIDTH;
+            int left = stripWid;
             for(int i=0;i<nfp.size();++i) {
                 orb.SetPosition(nfp[i],0);
-                if(orb.X()<0 || orb.X()+orb.Width()>STRIP_WIDTH)
+                if(orb.X()<0 || orb.X()+orb.Width()>stripWid)
                     continue;
 
-                if(orb.Y()<0 || orb.Y()+orb.Height()>STRIP_HEIGHT)
+                if(orb.Y()<0 || orb.Y()+orb.Height()>stripHei)
                     continue;
 
                 if(orb.X()<left)

@@ -9,5 +9,6 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/LB_NFPHandle.cpp \
+    $$PWD/LB_NestConfig.cpp \
     $$PWD/LB_NestThread.cpp \
     $$PWD/LB_Polygon2D.cpp

@@ -25,16 +25,22 @@ MainWindow::MainWindow(QWidget *parent) :
     nestThread = new LB_NestThread(this);
     configWid = new NestConfigWidget(this);
 
-    connect(nestThread,&LB_NestThread::AddItem,stripScene,&Strip::AddOneItem);
+    connect(nestThread,&LB_NestThread::AddItem,this,[=](LB_Polygon2D poly) {
+        stripScene->AddOneItem(poly);
+        arrangNb++;
+        ui->progressBar_nest->setValue(100*arrangNb/srcPolys.size());
+    });
     connect(nestThread,&LB_NestThread::AddStrip,stripScene,&Strip::AddOneStrip);
     connect(nestThread,&LB_NestThread::NestEnd,this,&MainWindow::onNestEnd);
     connect(configWid,&QDialog::accepted,this,[=]() {
         ui->label_stripWidth->setText(tr("Strip width:%1").arg(stripScene->getStripWidth()));
         ui->label_stripHeight->setText(tr("Strip height:%1").arg(stripScene->getStripHeight()));
-        stripScene->InitSize();
+        stripScene->Reset();
     });
 
     ui->graphicsView_result->setScene(stripScene);
+    ui->label_stripWidth->setText(tr("Strip width:%1").arg(stripScene->getStripWidth()));
+    ui->label_stripHeight->setText(tr("Strip height:%1").arg(stripScene->getStripHeight()));
 }
 
 MainWindow::~MainWindow()
@@ -50,6 +56,7 @@ void MainWindow::on_action_openFile_triggered()
 
     srcPolys = loadPolygons(fileName);
     ui->label_polygonNb->setText(tr("Polygon number:%1").arg(srcPolys.size()));
+
     totalArea = 0;
     foreach(LB_Polygon2D aPoly,srcPolys) {
         totalArea += abs(aPoly.Area());
@@ -70,8 +77,6 @@ void MainWindow::on_action_saveResult_triggered()
 
 void MainWindow::on_action_solve_triggered()
 {
-    stripScene->InitSize();
-
     if(srcPolys.isEmpty())
         return;
 
@@ -83,6 +88,7 @@ void MainWindow::on_action_solve_triggered()
 void MainWindow::on_action_reset_triggered()
 {
     stripScene->Reset();
+    arrangNb = 0;
     totalArea = 0;
     srcPolys.clear();    
 
@@ -90,6 +96,7 @@ void MainWindow::on_action_reset_triggered()
     ui->label_polygonNb->setText(tr("Polygon number:XXX"));
     ui->label_totalArea->setText(tr("Total area:XXX"));
     ui->label_utilizationRate->setText(tr("Utilization rate:XXX"));
+    ui->progressBar_nest->setValue(0);
     setWindowTitle(tr("NFPNest"));
 }
 
@@ -284,4 +291,7 @@ QVector<LB_Polygon2D> MainWindow::loadPolygons(const QString &fileName)
 
 void MainWindow::test()
 {
+    for (int i=0;i<100;++i) {
+        srcPolys.append(randomPolygon());
+    }
 }
