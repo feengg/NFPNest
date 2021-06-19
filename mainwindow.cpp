@@ -50,7 +50,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_action_openFile_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this,tr("polygon"),"D:/poly","*.fply");
+    QString fileName = QFileDialog::getOpenFileName(this,tr("polygon"),QApplication::applicationDirPath(),"*.fply");
     if(fileName.isEmpty())
         return;
 
